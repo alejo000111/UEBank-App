@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UEBank</string>
+
+    <!-- Login -->
+    <string name="login_titulo">UEBank</string>
+    <string name="login_subtitulo">Tu banco desde el celular</string>
+    <string name="hint_usuario">Usuario o correo</string>
+    <string name="hint_password">Contraseña</string>
+    <string name="cb_recordar_sesion">Recordar sesión</string>
+    <string name="btn_ingresar">Ingresar</string>
+    <string name="link_ir_registro">¿No tienes cuenta? Regístrate</string>
+    <string name="error_campos_vacios">Completa todos los campos.</string>
+    <string name="error_usuario_no_existe">No existe un usuario con esos datos.</string>
+    <string name="error_password_incorrecta">La contraseña es incorrecta.</string>
+
+    <!-- Registro -->
+    <string name="registro_titulo">Crear cuenta</string>
+    <string name="hint_nombre">Nombre completo</string>
+    <string name="hint_confirmar_password">Confirmar contraseña</string>
+    <string name="hint_saldo_inicial">Saldo inicial (opcional)</string>
+    <string name="btn_registrarme">Registrarme</string>
+    <string name="link_ir_login">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="error_password_corta">La contraseña debe tener al menos 6 caracteres.</string>
+    <string name="error_password_no_coincide">Las contraseñas no coinciden.</string>
+    <string name="error_usuario_existente">Ese usuario ya está registrado.</string>
+    <string name="exito_registro">Cuenta creada. ¡Bienvenido a UEBank!</string>
+
+    <!-- Panel principal -->
+    <string name="saludo_usuario">Hola, %1$s</string>
+    <string name="saldo_disponible">Saldo disponible</string>
+    <string name="btn_mi_perfil">Mi perfil</string>
+    <string name="btn_beneficiarios">Beneficiarios</string>
+    <string name="btn_movimientos">Movimientos</string>
+    <string name="btn_cerrar_sesion">Cerrar sesión</string>
+    <string name="funcion_proximamente">Disponible próximamente</string>
+
+    <!-- Perfil -->
+    <string name="perfil_titulo">Mi perfil</string>
+    <string name="btn_tomar_foto">Tomar foto de perfil</string>
+    <string name="btn_volver">Volver</string>
+    <string name="permiso_camara_denegado">Necesitamos el permiso de cámara para tomar tu foto de perfil.</string>
+    <string name="foto_guardada">Foto de perfil actualizada.</string>
+</resources>

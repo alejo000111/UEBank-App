@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.UEBank" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/ue_bank_primary</item>
+        <item name="colorPrimaryDark">@color/ue_bank_primary_dark</item>
+        <item name="colorAccent">@color/ue_bank_accent</item>
+    </style>
+
+    <style name="Theme.UEBank" parent="Base.Theme.UEBank" />
+</resources>
