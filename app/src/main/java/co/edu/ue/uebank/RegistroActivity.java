@@ -35,7 +35,6 @@ public class RegistroActivity extends AppCompatActivity {
     private EditText etUsuario;
     private EditText etPassword;
     private EditText etConfirmarPassword;
-    private EditText etSaldoInicial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +60,6 @@ public class RegistroActivity extends AppCompatActivity {
         this.etUsuario = findViewById(R.id.etUsuario);
         this.etPassword = findViewById(R.id.etPassword);
         this.etConfirmarPassword = findViewById(R.id.etConfirmarPassword);
-        this.etSaldoInicial = findViewById(R.id.etSaldoInicial);
     }
 
     private void setupEventListeners() {
@@ -99,10 +97,8 @@ public class RegistroActivity extends AppCompatActivity {
             return;
         }
 
-        double saldoInicial = leerSaldoInicial();
-
         String passwordHash = PasswordUtils.crearHashAlmacenable(password);
-        Usuario nuevoUsuario = new Usuario(nombre, usuario, passwordHash, saldoInicial);
+        Usuario nuevoUsuario = new Usuario(nombre, usuario, passwordHash);
 
         long idGenerado = usuarioRepository.insertarUsuario(nuevoUsuario);
         if (idGenerado == -1) {
@@ -121,17 +117,5 @@ public class RegistroActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-    private double leerSaldoInicial() {
-        String texto = etSaldoInicial.getText().toString().trim();
-        if (TextUtils.isEmpty(texto)) {
-            return 0;
-        }
-        try {
-            return Double.parseDouble(texto);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
     }
 }

@@ -18,7 +18,6 @@
     <string name="registro_titulo">Crear cuenta</string>
     <string name="hint_nombre">Nombre completo</string>
     <string name="hint_confirmar_password">Confirmar contraseña</string>
-    <string name="hint_saldo_inicial">Saldo inicial (opcional)</string>
     <string name="btn_registrarme">Registrarme</string>
     <string name="link_ir_login">¿Ya tienes cuenta? Inicia sesión</string>
     <string name="error_password_corta">La contraseña debe tener al menos 6 caracteres.</string>
@@ -29,11 +28,76 @@
     <!-- Panel principal -->
     <string name="saludo_usuario">Hola, %1$s</string>
     <string name="saldo_disponible">Saldo disponible</string>
+    <string name="saldo_cargando">Cargando…</string>
+    <string name="saldo_no_disponible">No disponible (sin conexión)</string>
     <string name="btn_mi_perfil">Mi perfil</string>
     <string name="btn_beneficiarios">Beneficiarios</string>
+    <string name="btn_cuentas">Mis cuentas</string>
     <string name="btn_movimientos">Movimientos</string>
+    <string name="btn_metas">Metas de ahorro</string>
     <string name="btn_cerrar_sesion">Cerrar sesión</string>
-    <string name="funcion_proximamente">Disponible próximamente</string>
+
+    <!-- Comunes a las pantallas de listado -->
+    <string name="lista_vacia">Aún no hay registros.</string>
+    <string name="btn_guardar">Guardar</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="opcion_editar">Editar</string>
+    <string name="opcion_eliminar">Eliminar</string>
+    <string name="confirmar_eliminar">¿Seguro que quieres eliminar este registro?</string>
+    <string name="error_conexion">No se pudo conectar con el servidor. Revisa que la API esté encendida.</string>
+    <string name="error_generico">Ocurrió un error inesperado.</string>
+    <string name="error_dato_invalido">Revisa los datos: hay un campo vacío o con formato incorrecto.</string>
+    <string name="exito_guardado">Guardado correctamente.</string>
+    <string name="exito_eliminado">Eliminado correctamente.</string>
+
+    <!-- Beneficiarios (SQLite + contactos) -->
+    <string name="beneficiarios_titulo">Beneficiarios</string>
+    <string name="beneficiario_agregar">Agregar beneficiario</string>
+    <string name="beneficiario_nuevo">Nuevo beneficiario</string>
+    <string name="beneficiario_editar">Editar beneficiario</string>
+    <string name="beneficiario_origen_titulo">¿Cómo quieres agregarlo?</string>
+    <string name="beneficiario_origen_manual">Escribir los datos</string>
+    <string name="beneficiario_origen_contactos">Elegir de mis contactos</string>
+    <string name="hint_cuenta_destino">Número de cuenta</string>
+    <string name="hint_telefono">Teléfono</string>
+    <string name="beneficiario_sin_telefono">Sin teléfono</string>
+    <string name="contacto_no_leido">No se pudo leer el contacto seleccionado.</string>
+
+    <!-- Cuentas (API) -->
+    <string name="cuentas_titulo">Mis cuentas</string>
+    <string name="cuenta_agregar">Abrir cuenta</string>
+    <string name="cuenta_nueva">Nueva cuenta</string>
+    <string name="cuenta_editar">Editar cuenta</string>
+    <string name="hint_numero_cuenta">Número de cuenta</string>
+    <string name="hint_tipo_cuenta">Tipo (AHORROS o CORRIENTE)</string>
+    <string name="hint_saldo_inicial_cuenta">Saldo inicial</string>
+    <string name="opcion_ver_movimientos">Ver movimientos</string>
+    <string name="cuenta_etiqueta">Cuenta %1$s</string>
+
+    <!-- Movimientos (API) -->
+    <string name="movimientos_titulo">Movimientos</string>
+    <string name="movimiento_agregar">Registrar movimiento</string>
+    <string name="movimiento_nuevo">Nuevo movimiento</string>
+    <string name="movimiento_editar">Editar descripción</string>
+    <string name="movimiento_elegir_cuenta">¿En qué cuenta?</string>
+    <string name="movimiento_elegir_tipo">Tipo de movimiento</string>
+    <string name="movimiento_deposito">Depósito</string>
+    <string name="movimiento_retiro">Retiro</string>
+    <string name="movimiento_sin_cuentas">Primero abre una cuenta en «Mis cuentas».</string>
+    <string name="hint_monto">Monto</string>
+    <string name="hint_descripcion">Descripción</string>
+    <string name="confirmar_anular">¿Anular este movimiento? El saldo de la cuenta se revertirá.</string>
+
+    <!-- Metas de ahorro (API) -->
+    <string name="metas_titulo">Metas de ahorro</string>
+    <string name="meta_agregar">Nueva meta</string>
+    <string name="meta_editar">Editar meta</string>
+    <string name="hint_nombre_meta">Nombre de la meta</string>
+    <string name="hint_monto_objetivo">Monto objetivo</string>
+    <string name="hint_monto_ahorrado">Monto ahorrado</string>
+    <string name="hint_fecha_limite">Fecha límite AAAA-MM-DD (opcional)</string>
+    <string name="error_numero_cuenta_invalido">El número de cuenta debe tener entre 4 y 20 dígitos.</string>
+    <string name="error_fecha_invalida">La fecha debe existir y tener el formato AAAA-MM-DD.</string>
 
     <!-- Perfil -->
     <string name="perfil_titulo">Mi perfil</string>

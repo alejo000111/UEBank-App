@@ -18,13 +18,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
+import co.edu.ue.uebank.api.SaldoTotal;
 import co.edu.ue.uebank.data.UsuarioRepository;
 import co.edu.ue.uebank.managers.FotoPerfilManager;
 import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
+import co.edu.ue.uebank.ui.Formato;
 
 /**
  * Pantalla de perfil: muestra los datos del cliente y permite tomarle una
@@ -145,8 +144,11 @@ public class PerfilActivity extends AppCompatActivity {
         tvNombrePerfil.setText(usuarioActual.getNombre());
         tvUsuarioPerfil.setText(usuarioActual.getUsuario());
 
-        NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        tvSaldoPerfil.setText(formatoMoneda.format(usuarioActual.getSaldo()));
+        // Mismo saldo unificado que el panel principal: se consulta a la API,
+        // nunca a un campo local (ver SaldoTotal).
+        tvSaldoPerfil.setText(R.string.saldo_cargando);
+        SaldoTotal.consultar(this, usuarioActual.getUsuario(), total -> tvSaldoPerfil.setText(
+                total == null ? getString(R.string.saldo_no_disponible) : Formato.moneda(total)));
 
         Bitmap fotoGuardada = fotoPerfilManager.cargarFotoPerfil(usuarioActual.getFotoPath());
         if (fotoGuardada != null) {

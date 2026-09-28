@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -38,6 +39,11 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Debe llamarse ANTES de super.onCreate(): instala la pantalla de
+        // bienvenida (splash) que Android muestra mientras arranca el
+        // proceso de la app, y que se cierra sola al dibujarse esta pantalla.
+        SplashScreen.installSplashScreen(this);
+
         super.onCreate(savedInstanceState);
 
         this.usuarioRepository = new UsuarioRepository(this);

@@ -32,7 +32,6 @@ public class UsuarioRepository {
         valores.put(UsuarioEntry.COLUMN_NOMBRE, usuario.getNombre());
         valores.put(UsuarioEntry.COLUMN_USUARIO, usuario.getUsuario());
         valores.put(UsuarioEntry.COLUMN_PASSWORD_HASH, usuario.getPasswordHash());
-        valores.put(UsuarioEntry.COLUMN_SALDO, usuario.getSaldo());
 
         // insert() devuelve -1 automáticamente si se viola la restricción UNIQUE.
         return db.insert(UsuarioEntry.TABLE_NAME, null, valores);
@@ -115,7 +114,6 @@ public class UsuarioRepository {
         usuario.setNombre(cursor.getString(cursor.getColumnIndexOrThrow(UsuarioEntry.COLUMN_NOMBRE)));
         usuario.setUsuario(cursor.getString(cursor.getColumnIndexOrThrow(UsuarioEntry.COLUMN_USUARIO)));
         usuario.setPasswordHash(cursor.getString(cursor.getColumnIndexOrThrow(UsuarioEntry.COLUMN_PASSWORD_HASH)));
-        usuario.setSaldo(cursor.getDouble(cursor.getColumnIndexOrThrow(UsuarioEntry.COLUMN_SALDO)));
         usuario.setFotoPath(cursor.getString(cursor.getColumnIndexOrThrow(UsuarioEntry.COLUMN_FOTO_PATH)));
         return usuario;
     }

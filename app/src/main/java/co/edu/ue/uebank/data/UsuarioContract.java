@@ -20,7 +20,6 @@ public final class UsuarioContract {
         public static final String COLUMN_NOMBRE = "nombre";
         public static final String COLUMN_USUARIO = "usuario";
         public static final String COLUMN_PASSWORD_HASH = "password_hash";
-        public static final String COLUMN_SALDO = "saldo";
         public static final String COLUMN_FOTO_PATH = "foto_path";
     }
 }

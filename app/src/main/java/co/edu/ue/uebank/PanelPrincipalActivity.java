@@ -12,18 +12,22 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
+import co.edu.ue.uebank.api.SaldoTotal;
 import co.edu.ue.uebank.data.UsuarioRepository;
 import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
+import co.edu.ue.uebank.ui.Formato;
 
 /**
  * Panel principal: lo primero que ve el cliente luego de iniciar sesión.
- * Por ahora muestra su saludo y su saldo; los botones de Beneficiarios y
- * Movimientos quedan como punto de partida para las próximas entregas
- * (Room para el CRUD de beneficiarios, y la API REST para los movimientos).
+ * Muestra su saludo y su saldo, y da acceso a los módulos: Beneficiarios
+ * (SQLite + contactos) y Cuentas, Movimientos y Metas de ahorro (API REST
+ * con PostgreSQL).
+ *
+ * El saldo mostrado NO es un dato local: se consulta a la API y es la suma
+ * de todas las cuentas del cliente (ver SaldoTotal). Así hay una única
+ * fuente de verdad para el dinero del cliente, en vez de un número separado
+ * y potencialmente desactualizado en SQLite.
  */
 public class PanelPrincipalActivity extends AppCompatActivity {
 
@@ -64,11 +68,19 @@ public class PanelPrincipalActivity extends AppCompatActivity {
 
         Button btnBeneficiarios = findViewById(R.id.btnBeneficiarios);
         btnBeneficiarios.setOnClickListener(v ->
-                Toast.makeText(this, R.string.funcion_proximamente, Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, BeneficiariosActivity.class)));
+
+        Button btnCuentas = findViewById(R.id.btnCuentas);
+        btnCuentas.setOnClickListener(v ->
+                startActivity(new Intent(this, CuentasActivity.class)));
 
         Button btnMovimientos = findViewById(R.id.btnMovimientos);
         btnMovimientos.setOnClickListener(v ->
-                Toast.makeText(this, R.string.funcion_proximamente, Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, MovimientosActivity.class)));
+
+        Button btnMetas = findViewById(R.id.btnMetas);
+        btnMetas.setOnClickListener(v ->
+                startActivity(new Intent(this, MetasActivity.class)));
 
         Button btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         btnCerrarSesion.setOnClickListener(v -> cerrarSesion());
@@ -94,8 +106,9 @@ public class PanelPrincipalActivity extends AppCompatActivity {
 
         tvSaludo.setText(getString(R.string.saludo_usuario, usuario.getNombre()));
 
-        NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        tvSaldo.setText(formatoMoneda.format(usuario.getSaldo()));
+        tvSaldo.setText(R.string.saldo_cargando);
+        SaldoTotal.consultar(this, usuario.getUsuario(), total -> tvSaldo.setText(
+                total == null ? getString(R.string.saldo_no_disponible) : Formato.moneda(total)));
     }
 
     private void cerrarSesion() {

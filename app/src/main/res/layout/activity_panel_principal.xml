@@ -65,11 +65,25 @@
             android:text="@string/btn_beneficiarios" />
 
         <Button
+            android:id="@+id/btnCuentas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/btn_cuentas" />
+
+        <Button
             android:id="@+id/btnMovimientos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/btn_movimientos" />
+
+        <Button
+            android:id="@+id/btnMetas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/btn_metas" />
 
         <Button
             android:id="@+id/btnCerrarSesion"

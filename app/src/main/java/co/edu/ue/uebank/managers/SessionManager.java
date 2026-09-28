@@ -55,6 +55,14 @@ public class SessionManager {
         return preferencias.getLong(KEY_ID, -1);
     }
 
+    /**
+     * Nombre de usuario (login) de la sesión activa. Es el dato con el que la
+     * API identifica al dueño de cada cuenta, movimiento y meta.
+     */
+    public String getUsuario() {
+        return preferencias.getString(KEY_USUARIO, "");
+    }
+
     public String getNombreUsuario() {
         return preferencias.getString(KEY_NOMBRE, "");
     }

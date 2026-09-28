@@ -7,4 +7,14 @@
     </style>
 
     <style name="Theme.UEBank" parent="Base.Theme.UEBank" />
+
+    <!-- Tema de la pantalla de bienvenida (splash screen), solo para la
+         Activity de lanzamiento (LoginActivity). Se ve mientras Android
+         termina de iniciar el proceso de la app; luego cambia sola al tema
+         normal (postSplashScreenTheme). -->
+    <style name="Theme.UEBank.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ue_bank_primary</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.UEBank</item>
+    </style>
 </resources>
