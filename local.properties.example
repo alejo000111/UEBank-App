@@ -1,0 +1,17 @@
+# Copia las líneas que necesites a tu propio local.properties (ese archivo
+# NO se sube a Git; cada integrante del equipo tiene el suyo). No borres la
+# línea sdk.dir que Android Studio ya te generó.
+
+# URL de la API para este computador. Déjala así si vas a correr la API en
+# tu propia máquina y a probar en el EMULADOR de Android:
+API_BASE_URL=http://10.0.2.2:3000/api/
+
+# Si vas a probar en un CELULAR FÍSICO conectado a la misma red WiFi que tu
+# computador, usa la IP de tu computador en esa red (ej. ipconfig / ifconfig)
+# y agrega esa misma IP en app/src/main/res/xml/network_security_config.xml:
+# API_BASE_URL=http://192.168.1.23:3000/api/
+
+# Si el equipo desplegó la API en un servicio en la nube (recomendado para
+# que todos prueben sin instalar PostgreSQL: ver backend/README.md), usa esa
+# URL pública con HTTPS -- así no hace falta tocar network_security_config.xml:
+# API_BASE_URL=https://uebank-api.onrender.com/api/

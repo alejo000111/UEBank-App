@@ -16,8 +16,15 @@
    ```
 5. Probar: abrir http://localhost:3000/api/health → `{"ok":true}`.
 
-El emulador de Android accede a esta API como `http://10.0.2.2:3000/api/`.
-Con un celular físico, usar la IP del computador en la red WiFi (y agregarla en `app/src/main/res/xml/network_security_config.xml`).
+## Conectar la app a esta API
+
+**Cada integrante del equipo necesita la API corriendo para ver saldos, cuentas, movimientos y metas.** Sin ella, la app funciona igual (login, registro, beneficiarios, foto) pero muestra "No disponible" o "No se pudo conectar con el servidor" en esas pantallas — eso es justamente lo que se ve si a alguien "no le guarda el saldo": no le falta nada en la app, le falta correr este backend.
+
+La URL de la API se configura en `local.properties` (raíz del proyecto Android), **no en el código** — así cada quien apunta a la suya sin generar conflictos de Git. Ver la plantilla en [`local.properties.example`](../local.properties.example). Opciones, de más simple a más cómoda para trabajar en equipo:
+
+1. **Cada quien corre su propia API + su propio PostgreSQL** (lo descrito arriba) y prueba en el emulador con el valor por defecto (`http://10.0.2.2:3000/api/`). Ventaja: no depende de que nadie más tenga el computador prendido. Desventaja: cada uno ve sus propios datos, no los mismos que sus compañeros.
+2. **Un celular físico** en la misma red WiFi que el computador con la API: usar la IP de ese computador (`API_BASE_URL=http://192.168.x.x:3000/api/` en `local.properties`) y agregar esa misma IP en `app/src/main/res/xml/network_security_config.xml` (Android bloquea HTTP sin cifrar hacia hosts no listados ahí).
+3. **Recomendado para probar todos juntos:** desplegar esta API en un servicio gratuito con PostgreSQL incluido (por ejemplo [Render](https://render.com) o [Railway](https://railway.app)) y que todo el equipo apunte su `local.properties` a esa URL pública HTTPS. Así todos ven la misma base de datos, nadie necesita instalar PostgreSQL, y al ser HTTPS tampoco hace falta tocar `network_security_config.xml`. Si quieren, puedo preparar el `Dockerfile`/`render.yaml` para dejarlo listo.
 
 ## Endpoints (3 CRUD)
 

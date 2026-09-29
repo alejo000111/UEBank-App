@@ -100,8 +100,18 @@ public abstract class ListaBaseActivity<T> extends AppCompatActivity {
         mostrarCargando(false);
     }
 
+    /**
+     * Prende o apaga el círculo de "cargando" de SwipeRefreshLayout.
+     *
+     * OJO: SwipeRefreshLayout tiene un bug conocido cuando se llama a
+     * setRefreshing() ANTES de que la vista termine su primer layout (por
+     * ejemplo, en Beneficiarios: como lee de SQLite, termina tan rápido que
+     * "true" y "false" llegan casi al mismo tiempo). El resultado es que el
+     * círculo se queda girando para siempre, aunque los datos ya cargaron.
+     * Encolarlo con post() lo difiere hasta después del layout y evita el bug.
+     */
     protected void mostrarCargando(boolean cargando) {
-        swipeRefresh.setRefreshing(cargando);
+        swipeRefresh.post(() -> swipeRefresh.setRefreshing(cargando));
     }
 
     protected String getUsuario() {

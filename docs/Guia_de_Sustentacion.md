@@ -99,6 +99,7 @@ Antes, el panel principal mostraba `usuarios.saldo` (un número guardado en SQLi
 - Retrofit ejecuta las llamadas en un hilo secundario (`enqueue`) y devuelve el resultado al hilo principal: la pantalla no se congela.
 - `10.0.2.2` es el "localhost" del computador visto desde el emulador.
 - Android bloquea HTTP sin cifrar por defecto; `network_security_config.xml` lo permite **solo** para `10.0.2.2` y `localhost` (desarrollo). Es una decisión deliberada solo para poder probar contra la API local sin montar un servidor HTTPS; en producción se retira este permiso.
+- La URL de la API (`ApiClient.BASE_URL`) sale de `local.properties` (vía `BuildConfig.API_BASE_URL`), **no está escrita en el código**: cada integrante del equipo apunta a su propio backend sin generar conflictos de Git al compartir el repositorio. Ver `local.properties.example` y `backend/README.md`.
 
 ### 6.7 Detalles de experiencia de usuario (UX)
 - **Indicador de carga:** las 4 pantallas de listado usan `SwipeRefreshLayout`: se ve girando mientras se cargan los datos (al entrar) y el usuario también puede deslizar hacia abajo para refrescar manualmente.
