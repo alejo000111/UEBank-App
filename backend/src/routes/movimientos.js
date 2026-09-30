@@ -6,7 +6,7 @@ const { exigirDueño } = require('../auth');
 
 const TIPOS = ['DEPOSITO', 'RETIRO'];
 
-// Ejecuta fn dentro de una transacción: o se guardan movimiento Y saldo, o ninguno.
+//Transacción
 async function enTransaccion(fn) {
   const client = await db.pool.connect();
   try {
@@ -25,7 +25,7 @@ async function enTransaccion(fn) {
 const SELECT_CON_CUENTA =
   'SELECT m.*, c.numero AS cuenta_numero FROM movimientos m JOIN cuentas c ON c.id = m.cuenta_id';
 
-// READ (lista): movimientos del usuario, opcionalmente de una sola cuenta
+//READ lista
 router.get('/', async (req, res) => {
   const usuario = requerido(req.query.usuario, 'usuario');
   exigirDueño(req, usuario);
@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
   res.json(rows);
 });
 
-// CREATE: registra el movimiento y actualiza el saldo de la cuenta
+//CREATE
 router.post('/', async (req, res) => {
   const cuentaId = numero(req.body.cuenta_id, 'cuenta_id', { min: 0, minExclusivo: true });
   const tipo = String(req.body.tipo || '').toUpperCase();
@@ -51,14 +51,11 @@ router.post('/', async (req, res) => {
   const descripcion = (req.body.descripcion || '').toString().trim();
 
   const creado = await enTransaccion(async (client) => {
-    // FOR UPDATE bloquea la fila para que dos movimientos simultáneos no pisen el saldo.
-    // Antes solo se comprobaba que la cuenta existiera: cualquiera que
-    // adivinara un cuenta_id ajeno podía depositar o retirar en ella.
+    //FOR UPDATE bloquea la fila; valida dueño antes de depositar/retirar
     const cuenta = await client.query(
       'SELECT usuario, saldo FROM cuentas WHERE id = $1 FOR UPDATE',
       [cuentaId]
     );
-    // 404 y no 403: para quien no es el dueño, una cuenta ajena "no existe".
     if (!cuenta.rows.length || cuenta.rows[0].usuario !== req.usuarioToken) {
       throw new HttpError(404, 'Cuenta no encontrada');
     }
@@ -77,7 +74,7 @@ router.post('/', async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-// UPDATE: solo la descripción (cambiar monto o tipo alteraría saldos ya registrados)
+//UPDATE
 router.put('/:id', async (req, res) => {
   const descripcion = (req.body.descripcion || '').toString().trim();
 
@@ -94,7 +91,7 @@ router.put('/:id', async (req, res) => {
   res.json(rows[0]);
 });
 
-// DELETE: anula el movimiento y revierte su efecto en el saldo
+//DELETE
 router.delete('/:id', async (req, res) => {
   await enTransaccion(async (client) => {
     const mov = await client.query(

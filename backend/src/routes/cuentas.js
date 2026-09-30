@@ -6,14 +6,14 @@ const { exigirDueño } = require('../auth');
 
 const TIPOS = ['AHORROS', 'CORRIENTE'];
 
+//Validar tipo de cuenta
 function tipoValido(tipo) {
   const t = String(tipo || 'AHORROS').toUpperCase();
   if (!TIPOS.includes(t)) throw new HttpError(400, 'El tipo debe ser AHORROS o CORRIENTE');
   return t;
 }
 
-// READ (lista): solo las cuentas del usuario indicado, y solo si ese
-// usuario es el dueño del token (ver requerirToken en server.js).
+//READ lista
 router.get('/', async (req, res) => {
   const usuario = requerido(req.query.usuario, 'usuario');
   exigirDueño(req, usuario);
@@ -21,8 +21,7 @@ router.get('/', async (req, res) => {
   res.json(rows);
 });
 
-// READ (una): 404 también cuando la cuenta existe pero es de otro usuario,
-// para no revelar con un 403 que ese id sí existe.
+//READ una
 router.get('/:id', async (req, res) => {
   const { rows } = await db.query('SELECT * FROM cuentas WHERE id = $1', [req.params.id]);
   if (!rows.length || rows[0].usuario !== req.usuarioToken) {
@@ -31,7 +30,7 @@ router.get('/:id', async (req, res) => {
   res.json(rows[0]);
 });
 
-// CREATE
+//CREATE
 router.post('/', async (req, res) => {
   const usuario = requerido(req.body.usuario, 'usuario');
   exigirDueño(req, usuario);
@@ -45,7 +44,7 @@ router.post('/', async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-// UPDATE: el saldo NO se edita aquí, solo cambia con movimientos
+//UPDATE
 router.put('/:id', async (req, res) => {
   const num = requerido(req.body.numero, 'numero');
   const tipo = tipoValido(req.body.tipo);
@@ -62,7 +61,7 @@ router.put('/:id', async (req, res) => {
   res.json(rows[0]);
 });
 
-// DELETE (sus movimientos se borran en cascada)
+//DELETE
 router.delete('/:id', async (req, res) => {
   const actual = await db.query('SELECT usuario FROM cuentas WHERE id = $1', [req.params.id]);
   if (!actual.rows.length || actual.rows[0].usuario !== req.usuarioToken) {
