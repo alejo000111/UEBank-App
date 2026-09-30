@@ -1,6 +1,9 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const db = require('./db');
 
 const app = express();
 app.use(cors());
@@ -8,6 +11,7 @@ app.use(express.json());
 
 const { requerirToken } = require('./auth');
 
+//Rutas
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 // Público: aquí es donde se consigue el token que las demás rutas exigen.
@@ -21,13 +25,13 @@ app.use('/api/cuentas', requerirToken, require('./routes/cuentas'));
 app.use('/api/movimientos', requerirToken, require('./routes/movimientos'));
 app.use('/api/metas', requerirToken, require('./routes/metas'));
 
+//Ruta no encontrada
 app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
 
-// Manejador global (Express 5 le pasa aquí también los errores de funciones async).
+//Manejador de errores
 app.use((err, req, res, next) => {
   if (err.status) return res.status(err.status).json({ error: err.message });
 
-  // Errores de PostgreSQL más comunes -> respuesta clara en vez de un 500.
   const porCodigo = {
     '23505': [409, 'Ya existe un registro con ese valor'],
     '23503': [400, 'La referencia indicada no existe'],
@@ -45,5 +49,17 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
+//Crear tablas
+async function crearTablas() {
+  const esquema = fs.readFileSync(path.join(__dirname, '..', 'schema.sql'), 'utf8');
+  await db.query(esquema);
+}
+
+//Iniciar servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`API UEBank escuchando en http://localhost:${PORT}`));
+crearTablas()
+  .then(() => app.listen(PORT, () => console.log(`API UEBank escuchando en http://localhost:${PORT}`)))
+  .catch((err) => {
+    console.error('No se pudo conectar con PostgreSQL:', err.message);
+    process.exit(1);
+  });
