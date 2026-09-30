@@ -141,7 +141,7 @@ Antes, la API identificaba al dueño de cada dato solo por el parámetro `usuari
 **¿Por qué no piden permiso de contactos?** Porque el selector del sistema da acceso solo al contacto elegido (principio de mínimo privilegio).
 
 **¿Qué mejoraría con más tiempo?** *(Sé honesto: son limitaciones reales.)*
-1. **Mover el login/registro.
+1. **Mover el login/registro completo a la API:** hoy la API confía en que el teléfono ya verificó la contraseña (ver 6.7) y el usuario y su contraseña siguen viviendo también en el SQLite local; si el cliente cambia de celular, pierde la cuenta. Lo ideal es que la API sea la única que verifica la contraseña, y SQLite quede como una caché local. Es ahora la limitación de seguridad más importante (la anterior, no tener JWT en absoluto, ya se resolvió: ver 6.7).
 2. HTTPS en producción y despliegue de la API.
 3. Migrar de SQLite nativo a Room + ViewModel/LiveData.
 4. Pruebas automáticas de la API (por ejemplo con `supertest`) y pruebas instrumentadas de la interfaz (Espresso).

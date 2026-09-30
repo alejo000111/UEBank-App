@@ -28,7 +28,7 @@
 **Justificación.**
 
 - **Necesidad:** los clientes esperan operar su dinero desde el teléfono, en cualquier momento y sin ir a una sucursal.
-- **Seguridad:** las contraseñas nunca se guardan en texto plano (PBKDF2 con sal), un requisito básico en aplicaciones financieras.
+- **Seguridad:** las contraseñas nunca se guardan en texto plano (PBKDF2 con sal), y desde la incorporación de autenticación JWT la API también exige un token válido para leer o modificar cuentas, movimientos y metas — requisitos básicos en aplicaciones financieras.
 - **Formación académica:** el proyecto integra las competencias exigidas por el curso: desarrollo Android con Java, persistencia local (SQLite, SharedPreferences, archivos), uso de recursos del dispositivo (cámara y contactos), y una arquitectura cliente-servidor con API REST y PostgreSQL.
 - **Trabajo en equipo:** aplica la gestión de proyectos con PMBOK en un grupo de tres personas.
 
