@@ -14,6 +14,7 @@ public class SessionManager {
     private static final String KEY_USUARIO = "usuario";
     private static final String KEY_NOMBRE = "nombre";
     private static final String KEY_RECORDAR = "recordar_sesion";
+    private static final String KEY_TOKEN = "token_api";
 
     private final SharedPreferences preferencias;
 
@@ -49,6 +50,15 @@ public class SessionManager {
 
     public String getNombreUsuario() {
         return preferencias.getString(KEY_NOMBRE, "");
+    }
+
+    //Guarda el JWT que devuelve la API (login/registro)
+    public void guardarToken(String token) {
+        preferencias.edit().putString(KEY_TOKEN, token).apply();
+    }
+
+    public String getToken() {
+        return preferencias.getString(KEY_TOKEN, null);
     }
 
     //Cerrar sesión

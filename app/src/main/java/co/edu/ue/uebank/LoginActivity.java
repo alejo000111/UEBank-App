@@ -16,6 +16,9 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import co.edu.ue.uebank.api.ApiCallback;
+import co.edu.ue.uebank.api.ApiClient;
+import co.edu.ue.uebank.api.AuthRequest;
 import co.edu.ue.uebank.data.UsuarioRepository;
 import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
@@ -41,6 +44,9 @@ public class LoginActivity extends AppCompatActivity {
 
         this.usuarioRepository = new UsuarioRepository(this);
         this.sessionManager = new SessionManager(this);
+
+        //Restaura el token JWT en memoria (se pierde si el proceso se reinicia)
+        ApiClient.setToken(sessionManager.getToken());
 
         if (sessionManager.haySesionRecordada()) {
             irAPanelPrincipal();
@@ -102,7 +108,26 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         sessionManager.iniciarSesion(usuarioEncontrado, cbRecordar.isChecked());
+
+        // La contraseña YA se verificó arriba contra el SQLite local; a la
+        // API solo se le manda ese mismo "salt:hash" (nunca la contraseña)
+        // para conseguir el JWT que exigen Cuentas/Movimientos/Metas. Si no
+        // hay conexión, sigue igual que hasta ahora: esas pantallas
+        // mostrarán "No disponible" hasta el próximo login con internet.
+        pedirTokenApi(usuarioEncontrado);
+
         irAPanelPrincipal();
+    }
+
+    //Pide el token JWT a la API tras verificar la contraseña localmente
+    private void pedirTokenApi(Usuario usuario) {
+        AuthRequest cuerpo = new AuthRequest(usuario.getUsuario(), usuario.getPasswordHash());
+        ApiClient.get().loginAuth(cuerpo).enqueue(new ApiCallback<>(getApplicationContext(), respuesta -> {
+            if (respuesta != null) {
+                sessionManager.guardarToken(respuesta.token);
+                ApiClient.setToken(respuesta.token);
+            }
+        }));
     }
 
     //Ir al panel principal
