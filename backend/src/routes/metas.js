@@ -3,6 +3,7 @@ const db = require('../db');
 const HttpError = require('../httpError');
 const { requerido, numero } = require('../validar');
 
+//Leer campos
 function leerCampos(body) {
   return [
     requerido(body.nombre, 'nombre'),
@@ -12,14 +13,14 @@ function leerCampos(body) {
   ];
 }
 
-// READ (lista)
+//READ lista
 router.get('/', async (req, res) => {
   const usuario = requerido(req.query.usuario, 'usuario');
   const { rows } = await db.query('SELECT * FROM metas WHERE usuario = $1 ORDER BY id', [usuario]);
   res.json(rows);
 });
 
-// CREATE
+//CREATE
 router.post('/', async (req, res) => {
   const usuario = requerido(req.body.usuario, 'usuario');
   const { rows } = await db.query(
@@ -30,7 +31,7 @@ router.post('/', async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-// UPDATE
+//UPDATE
 router.put('/:id', async (req, res) => {
   const { rows } = await db.query(
     `UPDATE metas SET nombre = $1, monto_objetivo = $2, monto_ahorrado = $3, fecha_limite = $4
@@ -41,7 +42,7 @@ router.put('/:id', async (req, res) => {
   res.json(rows[0]);
 });
 
-// DELETE
+//DELETE
 router.delete('/:id', async (req, res) => {
   const { rowCount } = await db.query('DELETE FROM metas WHERE id = $1', [req.params.id]);
   if (!rowCount) throw new HttpError(404, 'Meta no encontrada');

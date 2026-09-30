@@ -21,23 +21,17 @@ import java.util.List;
 import co.edu.ue.uebank.R;
 import co.edu.ue.uebank.managers.SessionManager;
 
-/**
- * Esqueleto común de las pantallas "lista + CRUD" (Beneficiarios, Cuentas,
- * Movimientos y Metas). Se encarga de lo repetitivo: layout, márgenes del
- * sistema, título, botón Agregar, RecyclerView, indicador de carga, mensaje
- * de "vacío" y botón Volver.
- *
- * Cada pantalla concreta solo dice QUÉ mostrar y QUÉ hacer al agregar o al
- * tocar un elemento (patrón "Template Method").
- */
+//Clase
 public abstract class ListaBaseActivity<T> extends AppCompatActivity {
 
+    //Atributos
     protected SessionManager sessionManager;
 
     private ListaAdapter<T> adapter;
     private TextView tvVacio;
     private SwipeRefreshLayout swipeRefresh;
 
+    //Métodos abstractos
     protected abstract int getTituloRes();
 
     protected abstract int getTextoAgregarRes();
@@ -46,13 +40,13 @@ public abstract class ListaBaseActivity<T> extends AppCompatActivity {
 
     protected abstract String subtitulo(T item);
 
-    /** Debe obtener los datos y terminar llamando a mostrar(lista). */
     protected abstract void cargarDatos();
 
     protected abstract void onAgregar();
 
     protected abstract void onItemSeleccionado(T item);
 
+    //Ciclo de vida
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,50 +79,44 @@ public abstract class ListaBaseActivity<T> extends AppCompatActivity {
         findViewById(R.id.btnVolver).setOnClickListener(v -> finish());
     }
 
+    //Al volver a la pantalla
     @Override
     protected void onResume() {
         super.onResume();
-        // Se recarga al volver a la pantalla para que siempre refleje lo último guardado.
         mostrarCargando(true);
         cargarDatos();
     }
 
-    /** Pinta la lista, muestra el mensaje de "vacío" si no hay datos y apaga el indicador de carga. */
+    //Mostrar lista
     protected void mostrar(List<T> datos) {
         adapter.actualizar(datos);
         tvVacio.setVisibility(adapter.estaVacia() ? View.VISIBLE : View.GONE);
         mostrarCargando(false);
     }
 
-    /**
-     * Prende o apaga el círculo de "cargando" de SwipeRefreshLayout.
-     *
-     * OJO: SwipeRefreshLayout tiene un bug conocido cuando se llama a
-     * setRefreshing() ANTES de que la vista termine su primer layout (por
-     * ejemplo, en Beneficiarios: como lee de SQLite, termina tan rápido que
-     * "true" y "false" llegan casi al mismo tiempo). El resultado es que el
-     * círculo se queda girando para siempre, aunque los datos ya cargaron.
-     * Encolarlo con post() lo difiere hasta después del layout y evita el bug.
-     */
+    //Indicador de carga
     protected void mostrarCargando(boolean cargando) {
         swipeRefresh.post(() -> swipeRefresh.setRefreshing(cargando));
     }
 
+    //Usuario en sesión
     protected String getUsuario() {
         return sessionManager.getUsuario();
     }
 
+    //Mensaje corto
     protected void toast(int mensajeRes) {
         Toast.makeText(this, mensajeRes, Toast.LENGTH_SHORT).show();
     }
 
-    /** Menú de opciones (Editar / Eliminar / ...) para el elemento tocado. */
+    //Menú de opciones
     protected void mostrarOpciones(String[] opciones, Runnable[] acciones) {
         new AlertDialog.Builder(this)
                 .setItems(opciones, (dialogo, indice) -> acciones[indice].run())
                 .show();
     }
 
+    //Confirmar acción
     protected void confirmar(int mensajeRes, Runnable alConfirmar) {
         new AlertDialog.Builder(this)
                 .setMessage(mensajeRes)

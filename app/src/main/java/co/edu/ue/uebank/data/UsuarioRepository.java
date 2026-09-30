@@ -8,23 +8,18 @@ import android.database.sqlite.SQLiteDatabase;
 import co.edu.ue.uebank.data.UsuarioContract.UsuarioEntry;
 import co.edu.ue.uebank.model.Usuario;
 
-/**
- * Repositorio de usuarios: es la única clase que sabe escribir SQL. El resto
- * de la app (las Activities) solo llama a estos métodos con objetos Usuario,
- * sin tener que preocuparse por Cursor, ContentValues, etc.
- */
+//Clase
 public class UsuarioRepository {
 
+    //Atributos
     private final DatabaseHelper databaseHelper;
 
+    //Constructor
     public UsuarioRepository(Context context) {
         this.databaseHelper = new DatabaseHelper(context);
     }
 
-    /**
-     * Inserta un usuario nuevo y devuelve su id generado, o -1 si el usuario
-     * ya existía (columna UNIQUE) o si ocurrió cualquier otro error.
-     */
+    //Insertar usuario
     public long insertarUsuario(Usuario usuario) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
@@ -33,13 +28,10 @@ public class UsuarioRepository {
         valores.put(UsuarioEntry.COLUMN_USUARIO, usuario.getUsuario());
         valores.put(UsuarioEntry.COLUMN_PASSWORD_HASH, usuario.getPasswordHash());
 
-        // insert() devuelve -1 automáticamente si se viola la restricción UNIQUE.
         return db.insert(UsuarioEntry.TABLE_NAME, null, valores);
     }
 
-    /**
-     * Busca un usuario por su nombre de usuario/correo. Devuelve null si no existe.
-     */
+    //Buscar por usuario
     public Usuario obtenerPorUsuario(String usuario) {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
@@ -62,10 +54,7 @@ public class UsuarioRepository {
         }
     }
 
-    /**
-     * Busca un usuario por su id, por ejemplo para recargar sus datos luego
-     * de iniciar sesión.
-     */
+    //Buscar por id
     public Usuario obtenerPorId(long id) {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
@@ -88,13 +77,12 @@ public class UsuarioRepository {
         }
     }
 
+    //Validar existencia
     public boolean existeUsuario(String usuario) {
         return obtenerPorUsuario(usuario) != null;
     }
 
-    /**
-     * Actualiza solamente la ruta de la foto de perfil de un usuario.
-     */
+    //Actualizar foto
     public void actualizarFotoPerfil(long id, String fotoPath) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
@@ -108,6 +96,7 @@ public class UsuarioRepository {
                 new String[]{String.valueOf(id)});
     }
 
+    //Cursor a objeto
     private Usuario mapearCursorAUsuario(Cursor cursor) {
         Usuario usuario = new Usuario();
         usuario.setId(cursor.getLong(cursor.getColumnIndexOrThrow(UsuarioEntry._ID)));

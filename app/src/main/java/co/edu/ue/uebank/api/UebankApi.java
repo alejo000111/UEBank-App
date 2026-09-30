@@ -11,14 +11,10 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-/**
- * Contrato de la API REST. Retrofit genera en tiempo de ejecución la
- * implementación de esta interfaz: cada método = una petición HTTP.
- * Son 3 CRUD completos: cuentas, movimientos y metas.
- */
+//Interfaz
 public interface UebankApi {
 
-    // ----- Cuentas -----
+    //Cuentas
     @GET("cuentas")
     Call<List<Cuenta>> listarCuentas(@Query("usuario") String usuario);
 
@@ -31,8 +27,7 @@ public interface UebankApi {
     @DELETE("cuentas/{id}")
     Call<Void> eliminarCuenta(@Path("id") long id);
 
-    // ----- Movimientos -----
-    // cuentaId es opcional: si es null, Retrofit no envía el parámetro.
+    //Movimientos
     @GET("movimientos")
     Call<List<Movimiento>> listarMovimientos(@Query("usuario") String usuario,
                                              @Query("cuenta_id") Long cuentaId);
@@ -46,7 +41,7 @@ public interface UebankApi {
     @DELETE("movimientos/{id}")
     Call<Void> eliminarMovimiento(@Path("id") long id);
 
-    // ----- Metas de ahorro -----
+    //Metas
     @GET("metas")
     Call<List<Meta>> listarMetas(@Query("usuario") String usuario);
 

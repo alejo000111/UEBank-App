@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">UEBank</string>
 
-    <!-- Login -->
+    <!--Login-->
     <string name="login_titulo">UEBank</string>
     <string name="login_subtitulo">Tu banco desde el celular</string>
     <string name="hint_usuario">Usuario o correo</string>
@@ -14,7 +14,7 @@
     <string name="error_usuario_no_existe">No existe un usuario con esos datos.</string>
     <string name="error_password_incorrecta">La contraseña es incorrecta.</string>
 
-    <!-- Registro -->
+    <!--Registro-->
     <string name="registro_titulo">Crear cuenta</string>
     <string name="hint_nombre">Nombre completo</string>
     <string name="hint_confirmar_password">Confirmar contraseña</string>
@@ -25,7 +25,7 @@
     <string name="error_usuario_existente">Ese usuario ya está registrado.</string>
     <string name="exito_registro">Cuenta creada. ¡Bienvenido a UEBank!</string>
 
-    <!-- Panel principal -->
+    <!--Panel principal-->
     <string name="saludo_usuario">Hola, %1$s</string>
     <string name="saldo_disponible">Saldo disponible</string>
     <string name="saldo_cargando">Cargando…</string>
@@ -37,7 +37,7 @@
     <string name="btn_metas">Metas de ahorro</string>
     <string name="btn_cerrar_sesion">Cerrar sesión</string>
 
-    <!-- Comunes a las pantallas de listado -->
+    <!--Listados-->
     <string name="lista_vacia">Aún no hay registros.</string>
     <string name="btn_guardar">Guardar</string>
     <string name="btn_cancelar">Cancelar</string>
@@ -50,7 +50,7 @@
     <string name="exito_guardado">Guardado correctamente.</string>
     <string name="exito_eliminado">Eliminado correctamente.</string>
 
-    <!-- Beneficiarios (SQLite + contactos) -->
+    <!--Beneficiarios-->
     <string name="beneficiarios_titulo">Beneficiarios</string>
     <string name="beneficiario_agregar">Agregar beneficiario</string>
     <string name="beneficiario_nuevo">Nuevo beneficiario</string>
@@ -63,7 +63,7 @@
     <string name="beneficiario_sin_telefono">Sin teléfono</string>
     <string name="contacto_no_leido">No se pudo leer el contacto seleccionado.</string>
 
-    <!-- Cuentas (API) -->
+    <!--Cuentas-->
     <string name="cuentas_titulo">Mis cuentas</string>
     <string name="cuenta_agregar">Abrir cuenta</string>
     <string name="cuenta_nueva">Nueva cuenta</string>
@@ -74,7 +74,7 @@
     <string name="opcion_ver_movimientos">Ver movimientos</string>
     <string name="cuenta_etiqueta">Cuenta %1$s</string>
 
-    <!-- Movimientos (API) -->
+    <!--Movimientos-->
     <string name="movimientos_titulo">Movimientos</string>
     <string name="movimiento_agregar">Registrar movimiento</string>
     <string name="movimiento_nuevo">Nuevo movimiento</string>
@@ -88,7 +88,7 @@
     <string name="hint_descripcion">Descripción</string>
     <string name="confirmar_anular">¿Anular este movimiento? El saldo de la cuenta se revertirá.</string>
 
-    <!-- Metas de ahorro (API) -->
+    <!--Metas-->
     <string name="metas_titulo">Metas de ahorro</string>
     <string name="meta_agregar">Nueva meta</string>
     <string name="meta_editar">Editar meta</string>
@@ -99,7 +99,7 @@
     <string name="error_numero_cuenta_invalido">El número de cuenta debe tener entre 4 y 20 dígitos.</string>
     <string name="error_fecha_invalida">La fecha debe existir y tener el formato AAAA-MM-DD.</string>
 
-    <!-- Perfil -->
+    <!--Perfil-->
     <string name="perfil_titulo">Mi perfil</string>
     <string name="btn_tomar_foto">Tomar foto de perfil</string>
     <string name="btn_volver">Volver</string>

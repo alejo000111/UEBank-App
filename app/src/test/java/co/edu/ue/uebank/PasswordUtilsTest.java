@@ -8,13 +8,10 @@ import org.junit.Test;
 
 import co.edu.ue.uebank.security.PasswordUtils;
 
-/**
- * Prueba unitaria de PasswordUtils. Corre en la máquina de desarrollo (no en
- * un emulador) porque, a partir de minSdk 26, PasswordUtils solo usa
- * java.security y java.util.Base64, sin depender de clases de Android.
- */
+//Clase
 public class PasswordUtilsTest {
 
+    //Prueba contraseña correcta
     @Test
     public void unaContrasenaCorrectaSeVerificaComoValida() {
         String hashAlmacenado = PasswordUtils.crearHashAlmacenable("miClaveSegura123");
@@ -22,6 +19,7 @@ public class PasswordUtilsTest {
         assertTrue(PasswordUtils.verificarPassword("miClaveSegura123", hashAlmacenado));
     }
 
+    //Prueba contraseña incorrecta
     @Test
     public void unaContrasenaIncorrectaSeRechaza() {
         String hashAlmacenado = PasswordUtils.crearHashAlmacenable("miClaveSegura123");
@@ -29,12 +27,12 @@ public class PasswordUtilsTest {
         assertFalse(PasswordUtils.verificarPassword("otraClave", hashAlmacenado));
     }
 
+    //Prueba sal distinta
     @Test
     public void dosUsuariosConLaMismaContrasenaGeneranHashesDistintos() {
         String hash1 = PasswordUtils.crearHashAlmacenable("claveRepetida");
         String hash2 = PasswordUtils.crearHashAlmacenable("claveRepetida");
 
-        // Deben ser distintos porque cada uno usa una sal aleatoria diferente.
         assertNotEquals(hash1, hash2);
     }
 }

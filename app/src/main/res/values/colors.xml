@@ -3,7 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Paleta simple del banco -->
+    <!--Colores del banco-->
     <color name="ue_bank_primary">#0D47A1</color>
     <color name="ue_bank_primary_dark">#092C63</color>
     <color name="ue_bank_accent">#FFC107</color>

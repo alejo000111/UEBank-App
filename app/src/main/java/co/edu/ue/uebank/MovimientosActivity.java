@@ -14,18 +14,10 @@ import co.edu.ue.uebank.ui.Formato;
 import co.edu.ue.uebank.ui.FormDialog;
 import co.edu.ue.uebank.ui.ListaBaseActivity;
 
-/**
- * CRUD de movimientos consumiendo la API REST.
- *
- * Al crear un movimiento, el SERVIDOR (no la app) actualiza el saldo de la
- * cuenta dentro de una transacción de PostgreSQL y rechaza los retiros que
- * superen el saldo. Anular un movimiento revierte su efecto.
- *
- * Si se abre desde "Ver movimientos" de una cuenta, recibe EXTRA_CUENTA_ID y
- * muestra solo los movimientos de esa cuenta.
- */
+//Clase
 public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
 
+    //Atributos
     public static final String EXTRA_CUENTA_ID = "cuenta_id";
 
     private static final String DEPOSITO = "DEPOSITO";
@@ -33,12 +25,14 @@ public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
 
     private long cuentaFiltro = -1;
 
+    //Ciclo de vida
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.cuentaFiltro = getIntent().getLongExtra(EXTRA_CUENTA_ID, -1);
     }
 
+    //Textos de la pantalla
     @Override
     protected int getTituloRes() {
         return R.string.movimientos_titulo;
@@ -62,7 +56,7 @@ public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
         return getString(R.string.cuenta_etiqueta, m.cuentaNumero) + "  ·  " + fecha + descripcion;
     }
 
-    // ---------- READ ----------
+    //READ
     @Override
     protected void cargarDatos() {
         Long filtro = cuentaFiltro == -1 ? null : cuentaFiltro;
@@ -70,7 +64,7 @@ public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
                 .enqueue(new ApiCallback<>(this, this::mostrar));
     }
 
-    // ---------- CREATE: elegir cuenta -> elegir tipo -> llenar monto ----------
+    //CREATE
     @Override
     protected void onAgregar() {
         if (cuentaFiltro != -1) {
@@ -80,6 +74,7 @@ public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
         ApiClient.get().listarCuentas(getUsuario()).enqueue(new ApiCallback<>(this, this::elegirCuenta));
     }
 
+    //Elegir cuenta
     private void elegirCuenta(List<Cuenta> cuentas) {
         if (cuentas == null || cuentas.isEmpty()) {
             toast(R.string.movimiento_sin_cuentas);
@@ -96,6 +91,7 @@ public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
                 .show();
     }
 
+    //Elegir tipo
     private void elegirTipo(long cuentaId) {
         String[] tipos = {getString(R.string.movimiento_deposito), getString(R.string.movimiento_retiro)};
         new AlertDialog.Builder(this)
@@ -105,6 +101,7 @@ public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
                 .show();
     }
 
+    //Formulario nuevo
     private void formularioNuevo(long cuentaId, String tipo) {
         String[] hints = {getString(R.string.hint_monto), getString(R.string.hint_descripcion)};
         int[] entradas = {
@@ -127,7 +124,7 @@ public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
         });
     }
 
-    // ---------- UPDATE (solo la descripción) / DELETE (anular) ----------
+    //UPDATE y DELETE
     @Override
     protected void onItemSeleccionado(Movimiento m) {
         mostrarOpciones(
@@ -143,6 +140,7 @@ public class MovimientosActivity extends ListaBaseActivity<Movimiento> {
                 });
     }
 
+    //Editar descripción
     private void editarDescripcion(Movimiento m) {
         FormDialog.mostrar(this, R.string.movimiento_editar,
                 new String[]{getString(R.string.hint_descripcion)},

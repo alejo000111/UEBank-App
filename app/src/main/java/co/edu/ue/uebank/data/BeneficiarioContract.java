@@ -2,15 +2,14 @@ package co.edu.ue.uebank.data;
 
 import android.provider.BaseColumns;
 
-/**
- * "Contrato" de la tabla de beneficiarios (mismo patrón que UsuarioContract).
- */
+//Clase
 public final class BeneficiarioContract {
 
+    //Constructor
     private BeneficiarioContract() {
-        // Solo contiene constantes.
     }
 
+    //Tabla beneficiarios
     public static final class BeneficiarioEntry implements BaseColumns {
         public static final String TABLE_NAME = "beneficiarios";
 

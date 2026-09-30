@@ -2,14 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permiso peligroso: se declara aquí, pero además hay que pedirlo en tiempo
-         de ejecución (ver PerfilActivity), tal como lo pide Android desde la API 23. -->
+    <!--Permisos-->
     <uses-permission android:name="android.permission.CAMERA" />
-
-    <!-- Necesario para consumir la API REST (Node.js + PostgreSQL). -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- El teléfono puede no tener cámara y la app debe poder instalarse igual. -->
+    <!--Cámara opcional-->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -25,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UEBank">
 
-        <!-- Pantalla de inicio de sesión: es la puerta de entrada de la app. -->
+        <!--Pantallas-->
         <activity
             android:name=".LoginActivity"
             android:exported="true"

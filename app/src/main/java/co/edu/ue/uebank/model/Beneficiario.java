@@ -1,17 +1,16 @@
 package co.edu.ue.uebank.model;
 
-/**
- * Persona a la que el cliente suele enviarle dinero. Se guarda en SQLite
- * (local) y pertenece a un usuario: cada cliente solo ve sus beneficiarios.
- */
+//Clase
 public class Beneficiario {
 
+    //Atributos
     private long id;
     private long idUsuario;
     private String nombre;
     private String numeroCuenta;
-    private String telefono; // opcional
+    private String telefono;
 
+    //Constructores
     public Beneficiario() {
     }
 
@@ -22,6 +21,7 @@ public class Beneficiario {
         this.telefono = telefono;
     }
 
+    //Getters y setters
     public long getId() {
         return id;
     }

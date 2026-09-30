@@ -19,13 +19,10 @@ import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
 import co.edu.ue.uebank.security.PasswordUtils;
 
-/**
- * Pantalla de registro de un cliente nuevo.
- * Valida los datos, calcula el hash de la contraseña (nunca se guarda en
- * texto plano) y guarda el usuario en SQLite mediante UsuarioRepository.
- */
+//Clase
 public class RegistroActivity extends AppCompatActivity {
 
+    //Atributos
     private static final int LONGITUD_MINIMA_PASSWORD = 6;
 
     private UsuarioRepository usuarioRepository;
@@ -36,6 +33,7 @@ public class RegistroActivity extends AppCompatActivity {
     private EditText etPassword;
     private EditText etConfirmarPassword;
 
+    //Ciclo de vida
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +53,7 @@ public class RegistroActivity extends AppCompatActivity {
         setupEventListeners();
     }
 
+    //Vistas
     private void initViews() {
         this.etNombre = findViewById(R.id.etNombre);
         this.etUsuario = findViewById(R.id.etUsuario);
@@ -62,6 +61,7 @@ public class RegistroActivity extends AppCompatActivity {
         this.etConfirmarPassword = findViewById(R.id.etConfirmarPassword);
     }
 
+    //Eventos
     private void setupEventListeners() {
         Button btnRegistrarme = findViewById(R.id.btnRegistrarme);
         btnRegistrarme.setOnClickListener(v -> intentarRegistrar());
@@ -70,6 +70,7 @@ public class RegistroActivity extends AppCompatActivity {
         tvIrLogin.setOnClickListener(v -> finish());
     }
 
+    //Registrar usuario
     private void intentarRegistrar() {
         String nombre = etNombre.getText().toString().trim();
         String usuario = etUsuario.getText().toString().trim();
@@ -109,8 +110,6 @@ public class RegistroActivity extends AppCompatActivity {
         nuevoUsuario.setId(idGenerado);
         Toast.makeText(this, R.string.exito_registro, Toast.LENGTH_LONG).show();
 
-        // Registrar e iniciar sesión de una vez mejora la experiencia: el
-        // usuario no tiene que volver a escribir sus datos en el login.
         sessionManager.iniciarSesion(nuevoUsuario, false);
 
         Intent intent = new Intent(this, PanelPrincipalActivity.class);

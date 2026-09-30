@@ -5,17 +5,10 @@ import android.content.SharedPreferences;
 
 import co.edu.ue.uebank.model.Usuario;
 
-/**
- * Guarda la sesión activa usando SharedPreferences: un almacén simple de
- * pares clave-valor que Android persiste en un archivo XML propio de la app.
- *
- * Se usa para dos cosas:
- * 1. Saber, mientras la app está abierta, quién es el usuario que inició sesión.
- * 2. Si el usuario marcó "Recordar sesión", saltarse la pantalla de login la
- *    próxima vez que abra la app (hasta que cierre sesión manualmente).
- */
+//Clase
 public class SessionManager {
 
+    //Atributos
     private static final String PREFS_NAME = "uebank_session";
     private static final String KEY_ID = "id_usuario";
     private static final String KEY_USUARIO = "usuario";
@@ -24,16 +17,13 @@ public class SessionManager {
 
     private final SharedPreferences preferencias;
 
+    //Constructor
     public SessionManager(Context context) {
         this.preferencias = context.getApplicationContext()
                 .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    /**
-     * Guarda los datos de la sesión activa. Si recordar es true, estos datos
-     * seguirán ahí la próxima vez que se abra la app, incluso si el usuario
-     * cierra la app por completo.
-     */
+    //Iniciar sesión
     public void iniciarSesion(Usuario usuario, boolean recordar) {
         preferencias.edit()
                 .putLong(KEY_ID, usuario.getId())
@@ -43,22 +33,16 @@ public class SessionManager {
                 .apply();
     }
 
-    /**
-     * true si hay una sesión guardada Y el usuario pidió que se recordara,
-     * es decir, si LoginActivity debe saltar directo al panel principal.
-     */
+    //Sesión recordada
     public boolean haySesionRecordada() {
         return preferencias.getBoolean(KEY_RECORDAR, false) && getIdUsuario() != -1;
     }
 
+    //Getters
     public long getIdUsuario() {
         return preferencias.getLong(KEY_ID, -1);
     }
 
-    /**
-     * Nombre de usuario (login) de la sesión activa. Es el dato con el que la
-     * API identifica al dueño de cada cuenta, movimiento y meta.
-     */
     public String getUsuario() {
         return preferencias.getString(KEY_USUARIO, "");
     }
@@ -67,9 +51,7 @@ public class SessionManager {
         return preferencias.getString(KEY_NOMBRE, "");
     }
 
-    /**
-     * Borra la sesión activa. Se llama al presionar "Cerrar sesión".
-     */
+    //Cerrar sesión
     public void cerrarSesion() {
         preferencias.edit().clear().apply();
     }

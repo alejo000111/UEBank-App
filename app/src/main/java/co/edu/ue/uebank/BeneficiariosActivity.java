@@ -17,20 +17,10 @@ import co.edu.ue.uebank.model.Beneficiario;
 import co.edu.ue.uebank.ui.FormDialog;
 import co.edu.ue.uebank.ui.ListaBaseActivity;
 
-/**
- * CRUD de beneficiarios sobre SQLite (local) + segundo recurso del dispositivo:
- * la agenda de CONTACTOS.
- *
- * Al agregar se puede elegir un contacto del teléfono; la app solo copia el
- * nombre y el número, y el usuario completa el número de cuenta.
- *
- * Nota de seguridad: se abre el selector de contactos del sistema
- * (ACTION_PICK). Android le da a la app acceso temporal ÚNICAMENTE al contacto
- * que el usuario escoge, así que no hace falta el permiso READ_CONTACTS ni
- * tener acceso a toda la agenda (principio de mínimo privilegio).
- */
+//Clase
 public class BeneficiariosActivity extends ListaBaseActivity<Beneficiario> {
 
+    //Atributos
     private static final int TIPO_TEXTO = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
     private static final int TIPO_NUMERO = InputType.TYPE_CLASS_NUMBER;
     private static final int TIPO_TELEFONO = InputType.TYPE_CLASS_PHONE;
@@ -38,12 +28,12 @@ public class BeneficiariosActivity extends ListaBaseActivity<Beneficiario> {
     private BeneficiarioRepository repositorio;
     private ActivityResultLauncher<Intent> selectorContactos;
 
+    //Ciclo de vida
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.repositorio = new BeneficiarioRepository(this);
 
-        // Se registra en onCreate (antes de STARTED), como exige ActivityResult.
         this.selectorContactos = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 resultado -> {
@@ -53,6 +43,7 @@ public class BeneficiariosActivity extends ListaBaseActivity<Beneficiario> {
                 });
     }
 
+    //Textos de la pantalla
     @Override
     protected int getTituloRes() {
         return R.string.beneficiarios_titulo;
@@ -76,12 +67,13 @@ public class BeneficiariosActivity extends ListaBaseActivity<Beneficiario> {
         return b.getNumeroCuenta() + "  ·  " + telefono;
     }
 
+    //READ
     @Override
     protected void cargarDatos() {
         mostrar(repositorio.listarPorUsuario(sessionManager.getIdUsuario()));
     }
 
-    // ---------- CREATE ----------
+    //CREATE
     @Override
     protected void onAgregar() {
         String[] opciones = {
@@ -102,7 +94,7 @@ public class BeneficiariosActivity extends ListaBaseActivity<Beneficiario> {
                 .show();
     }
 
-    /** Lee nombre y teléfono del contacto elegido y abre el formulario prellenado. */
+    //Leer contacto
     private void leerContacto(Uri uriContacto) {
         String[] columnas = {
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
@@ -119,7 +111,7 @@ public class BeneficiariosActivity extends ListaBaseActivity<Beneficiario> {
         toast(R.string.contacto_no_leido);
     }
 
-    // ---------- READ / UPDATE / DELETE ----------
+    //UPDATE y DELETE
     @Override
     protected void onItemSeleccionado(Beneficiario b) {
         mostrarOpciones(
@@ -134,9 +126,7 @@ public class BeneficiariosActivity extends ListaBaseActivity<Beneficiario> {
                 });
     }
 
-    /**
-     * Formulario para crear (existente == null) o editar un beneficiario.
-     */
+    //Formulario
     private void mostrarFormulario(Beneficiario existente, String nombre, String telefono) {
         String[] hints = {
                 getString(R.string.hint_nombre),

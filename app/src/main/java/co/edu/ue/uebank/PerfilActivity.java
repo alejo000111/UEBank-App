@@ -25,30 +25,20 @@ import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
 import co.edu.ue.uebank.ui.Formato;
 
-/**
- * Pantalla de perfil: muestra los datos del cliente y permite tomarle una
- * foto con la cámara del dispositivo.
- *
- * Aquí se aplica el flujo de permisos peligrosos que pide Android desde la
- * API 23: primero se revisa si el permiso ya fue concedido
- * (ContextCompat.checkSelfPermission) y, si no, se solicita en tiempo de
- * ejecución con un ActivityResultLauncher en vez del método antiguo
- * requestPermissions()/onRequestPermissionsResult().
- */
+//Clase
 public class PerfilActivity extends AppCompatActivity {
 
+    //Atributos
     private UsuarioRepository usuarioRepository;
     private FotoPerfilManager fotoPerfilManager;
     private Usuario usuarioActual;
 
     private ImageView ivFotoPerfil;
 
-    // Abre la cámara del sistema y devuelve una miniatura como Bitmap.
     private ActivityResultLauncher<Void> cameraLauncher;
-
-    // Muestra el diálogo de "Permitir/Denegar" del sistema para CAMERA.
     private ActivityResultLauncher<String> permissionLauncher;
 
+    //Ciclo de vida
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,10 +63,7 @@ public class PerfilActivity extends AppCompatActivity {
         mostrarDatosUsuario();
     }
 
-    /**
-     * Los ActivityResultLauncher deben registrarse antes de que la Activity
-     * quede en estado STARTED, por eso se hace en onCreate.
-     */
+    //Cámara y permiso
     private void registrarLaunchers() {
         this.cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.TakePicturePreview(),
@@ -97,10 +84,12 @@ public class PerfilActivity extends AppCompatActivity {
                 });
     }
 
+    //Vistas
     private void initViews() {
         this.ivFotoPerfil = findViewById(R.id.ivFotoPerfil);
     }
 
+    //Eventos
     private void setupEventListeners() {
         Button btnTomarFoto = findViewById(R.id.btnTomarFoto);
         btnTomarFoto.setOnClickListener(v -> abrirCamaraConPermiso());
@@ -109,6 +98,7 @@ public class PerfilActivity extends AppCompatActivity {
         btnVolver.setOnClickListener(v -> finish());
     }
 
+    //Abrir cámara
     private void abrirCamaraConPermiso() {
         boolean permisoConcedido = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED;
@@ -120,6 +110,7 @@ public class PerfilActivity extends AppCompatActivity {
         }
     }
 
+    //Guardar foto
     private void guardarNuevaFoto(Bitmap foto) {
         ivFotoPerfil.setImageBitmap(foto);
 
@@ -131,6 +122,7 @@ public class PerfilActivity extends AppCompatActivity {
         }
     }
 
+    //Mostrar datos
     private void mostrarDatosUsuario() {
         if (usuarioActual == null) {
             finish();
@@ -144,8 +136,6 @@ public class PerfilActivity extends AppCompatActivity {
         tvNombrePerfil.setText(usuarioActual.getNombre());
         tvUsuarioPerfil.setText(usuarioActual.getUsuario());
 
-        // Mismo saldo unificado que el panel principal: se consulta a la API,
-        // nunca a un campo local (ver SaldoTotal).
         tvSaldoPerfil.setText(R.string.saldo_cargando);
         SaldoTotal.consultar(this, usuarioActual.getUsuario(), total -> tvSaldoPerfil.setText(
                 total == null ? getString(R.string.saldo_no_disponible) : Formato.moneda(total)));
@@ -154,6 +144,5 @@ public class PerfilActivity extends AppCompatActivity {
         if (fotoGuardada != null) {
             ivFotoPerfil.setImageBitmap(fotoGuardada);
         }
-        // Si no hay foto guardada, se deja el ícono de silueta que ya trae el layout.
     }
 }

@@ -21,15 +21,10 @@ import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
 import co.edu.ue.uebank.security.PasswordUtils;
 
-/**
- * Pantalla de inicio de sesión y puerta de entrada de la app.
- *
- * Antes de mostrar el formulario revisa si ya hay una sesión "recordada"
- * (SharedPreferences) para saltar directo al panel principal, tal como lo
- * describe el módulo de autenticación del proyecto.
- */
+//Clase
 public class LoginActivity extends AppCompatActivity {
 
+    //Atributos
     private UsuarioRepository usuarioRepository;
     private SessionManager sessionManager;
 
@@ -37,11 +32,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private CheckBox cbRecordar;
 
+    //Ciclo de vida
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Debe llamarse ANTES de super.onCreate(): instala la pantalla de
-        // bienvenida (splash) que Android muestra mientras arranca el
-        // proceso de la app, y que se cierra sola al dibujarse esta pantalla.
         SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
@@ -49,8 +42,6 @@ public class LoginActivity extends AppCompatActivity {
         this.usuarioRepository = new UsuarioRepository(this);
         this.sessionManager = new SessionManager(this);
 
-        // Si el usuario ya marcó "Recordar sesión" antes, no le mostramos el
-        // login otra vez: lo mandamos directo al panel principal.
         if (sessionManager.haySesionRecordada()) {
             irAPanelPrincipal();
             return;
@@ -69,12 +60,14 @@ public class LoginActivity extends AppCompatActivity {
         setupEventListeners();
     }
 
+    //Vistas
     private void initViews() {
         this.etUsuario = findViewById(R.id.etUsuario);
         this.etPassword = findViewById(R.id.etPassword);
         this.cbRecordar = findViewById(R.id.cbRecordar);
     }
 
+    //Eventos
     private void setupEventListeners() {
         Button btnIngresar = findViewById(R.id.btnIngresar);
         btnIngresar.setOnClickListener(v -> intentarIniciarSesion());
@@ -84,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this, RegistroActivity.class)));
     }
 
+    //Iniciar sesión
     private void intentarIniciarSesion() {
         String usuario = etUsuario.getText().toString().trim();
         String password = etPassword.getText().toString();
@@ -111,10 +105,9 @@ public class LoginActivity extends AppCompatActivity {
         irAPanelPrincipal();
     }
 
+    //Ir al panel principal
     private void irAPanelPrincipal() {
         Intent intent = new Intent(this, PanelPrincipalActivity.class);
-        // Limpia el historial para que el botón "Atrás" no vuelva al login
-        // una vez la sesión ya está iniciada.
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

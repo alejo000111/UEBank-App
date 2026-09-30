@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Por defecto Android bloquea el tráfico HTTP sin cifrar (solo permite HTTPS).
-     Para desarrollar contra la API local se permite HTTP ÚNICAMENTE hacia estos hosts:
-     10.0.2.2 es la dirección con la que el emulador ve el localhost del computador.
-     En producción la API debe ir con HTTPS y este bloque se elimina. -->
+<!--HTTP permitido solo en desarrollo-->
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="false">10.0.2.2</domain>
