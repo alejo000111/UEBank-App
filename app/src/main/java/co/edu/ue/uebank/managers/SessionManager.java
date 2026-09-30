@@ -21,6 +21,7 @@ public class SessionManager {
     private static final String KEY_USUARIO = "usuario";
     private static final String KEY_NOMBRE = "nombre";
     private static final String KEY_RECORDAR = "recordar_sesion";
+    private static final String KEY_TOKEN = "token_api";
 
     private final SharedPreferences preferencias;
 
@@ -68,7 +69,24 @@ public class SessionManager {
     }
 
     /**
-     * Borra la sesión activa. Se llama al presionar "Cerrar sesión".
+     * Guarda el JWT que devuelve la API (POST /api/auth/login o /registro.
+     * ApiClient lo agrega como encabezado "Authorization: Bearer ..." en
+     * cada petición a cuentas, movimientos y metas (ver ApiClient.java).
+     * Puede ser null: si no hubo conexión al iniciar sesión, la app sigue
+     * funcionando localmente y esas tres pantallas mostrarán "No disponible"
+     * hasta que haya un token válido, igual que hoy pasa sin internet.
+     */
+    public void guardarToken(String token) {
+        preferencias.edit().putString(KEY_TOKEN, token).apply();
+    }
+
+    public String getToken() {
+        return preferencias.getString(KEY_TOKEN, null);
+    }
+
+    /**
+     * Borra la sesión activa (incluido el token). Se llama al presionar
+     * "Cerrar sesión".
      */
     public void cerrarSesion() {
         preferencias.edit().clear().apply();
