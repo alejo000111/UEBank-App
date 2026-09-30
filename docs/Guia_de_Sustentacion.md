@@ -14,17 +14,19 @@ UEBank es una app bancaria Android en **Java** conectada a una **API REST en Nod
 | SharedPreferences y archivos | `managers/SessionManager` (sesión) · `managers/FotoPerfilManager` (foto .jpg) |
 | Dos recursos del dispositivo | **Cámara** (`PerfilActivity`) y **Contactos** (`BeneficiariosActivity`) |
 | API + PostgreSQL + 3 CRUD | `backend/` → cuentas, movimientos, metas · consumidos por `CuentasActivity`, `MovimientosActivity`, `MetasActivity` |
+| Autenticación de la API (JWT) | `backend/src/auth.js` (firma y verifica el token) · `backend/src/routes/auth.js` (`/registro`, `/login`) · `api/ApiClient` (agrega el token a cada petición) |
 
 ## 3. Arquitectura
 
 ```
-┌─────────────── App Android (Java) ───────────────┐          ┌──── Servidor ────┐
+┌────────────── App Android (Java) ───────────────┐          ┌──── Servidor ────┐
 │ Activities (UI)                                  │          │ Node.js + Express│
 │   └─ ListaBaseActivity (esqueleto común)         │  HTTP    │  routes/         │
-│ data/   SQLite  ── usuarios, beneficiarios       │  JSON    │  (cuentas,       │
-│ managers/ SharedPreferences, archivos            │ ───────▶ │   movimientos,   │
-│ api/    Retrofit ── cuentas, movimientos, metas  │ ◀─────── │   metas)         │
-│ security/ PBKDF2                                 │          │       │          │
+│ data/   SQLite  ── usuarios, beneficiarios       │  JSON +  │  (auth, cuentas, │
+│ managers/ SharedPreferences, archivos, token JWT │  Bearer  │   movimientos,   │
+│ api/    Retrofit ── cuentas, movimientos, metas  │  token   │   metas)         │
+│ security/ PBKDF2                                 │ ───────▶ │  auth.js (JWT)   │
+│                                                   │ ◀─────── │       │          │
 └──────────────────────────────────────────────────┘          │  PostgreSQL      │
                                                               └──────────────────┘
 ```
@@ -58,7 +60,8 @@ UEBank es una app bancaria Android en **Java** conectada a una **API REST en Nod
 | **Almacenamiento interno (archivos)** | Foto de perfil, privada de la app |
 | **PBKDF2WithHmacSHA256** (120.000 iteraciones + sal aleatoria) | Hash de contraseñas |
 | **ActivityResult API** | Permiso de cámara, cámara y selector de contactos |
-| **Retrofit 2 + Gson** | Cliente HTTP y conversión JSON ↔ objetos Java |
+| **Retrofit 2 + Gson + OkHttp Interceptor** | Cliente HTTP, conversión JSON ↔ objetos Java, y agrega el JWT a cada petición |
+| **jsonwebtoken (JWT)** | La API firma y verifica los tokens que protegen cuentas, movimientos y metas |
 | **Node.js + Express 5** | API REST |
 | **PostgreSQL** (`pg`) | Base de datos del servidor, con `CHECK`, `UNIQUE`, `FOREIGN KEY` |
 | JUnit | Pruebas unitarias del hash (`PasswordUtilsTest`) |
@@ -101,7 +104,14 @@ Antes, el panel principal mostraba `usuarios.saldo` (un número guardado en SQLi
 - Android bloquea HTTP sin cifrar por defecto; `network_security_config.xml` lo permite **solo** para `10.0.2.2` y `localhost` (desarrollo). Es una decisión deliberada solo para poder probar contra la API local sin montar un servidor HTTPS; en producción se retira este permiso.
 - La URL de la API (`ApiClient.BASE_URL`) sale de `local.properties` (vía `BuildConfig.API_BASE_URL`), **no está escrita en el código**: cada integrante del equipo apunta a su propio backend sin generar conflictos de Git al compartir el repositorio. Ver `local.properties.example` y `backend/README.md`.
 
-### 6.7 Detalles de experiencia de usuario (UX)
+### 6.7 Autenticación de la API con JWT
+Antes, la API identificaba al dueño de cada dato solo por el parámetro `usuario` que mandaba la app: cualquiera que conociera la API podía pedir (o incluso borrar) los datos de otro usuario con solo escribir su nombre en la URL. Ahora:
+- **Login/registro local + token de la API:** la contraseña se sigue verificando en el teléfono contra el SQLite local (PBKDF2, como siempre). Justo después, la app manda ese mismo `salt:hash` (nunca la contraseña) a `POST /api/auth/login` o `/registro`; la API responde con un JWT firmado (`jsonwebtoken`, expira en 24h).
+- **Toda petición a cuentas/movimientos/metas exige ese token:** un `OkHttp Interceptor` en `ApiClient` se lo agrega automáticamente a cada llamada (`Authorization: Bearer <token>`), así que ninguna Activity tuvo que cambiar su forma de llamar a la API.
+- **El servidor nunca confía en el `usuario` de la URL o del body a secas:** el middleware `requerirToken` decodifica el JWT y guarda el usuario real en `req.usuarioToken`; cada ruta compara ese valor contra el dueño real de la fila (`exigirDueño`, o una consulta previa por id) antes de leer, editar o borrar. Sin token: `401`. Con token de otro usuario: `403` o `404` (404 en rutas por id, para no revelarle a un atacante que ese id sí existe).
+- **Limitación que queda (y se explica sin rodeos si preguntan):** la API todavía no verifica la contraseña por su cuenta — confía en que la app ya la verificó localmente antes de llamar a `/login`. La primera vez que un usuario llama a `/login`, la API registra ese hash como el suyo (modelo de "confiar en el primer uso"). Cerrar esto del todo requiere el siguiente paso pendiente: mover el login completo a la API (ver sección 8).
+
+### 6.8 Detalles de experiencia de usuario (UX)
 - **Indicador de carga:** las 4 pantallas de listado usan `SwipeRefreshLayout`: se ve girando mientras se cargan los datos (al entrar) y el usuario también puede deslizar hacia abajo para refrescar manualmente.
 - **Validación de formato en el cliente:** el número de cuenta (4 a 20 dígitos) y la fecha límite de una meta (`AAAA-MM-DD`, con fecha real: rechaza `2026-02-30`) se validan **antes** de llamar a la API (`Formato.numeroCuentaValido` / `Formato.fechaValida`). Evita una ida y vuelta de red innecesaria cuando el error ya es obvio en el teléfono; el servidor igual vuelve a validar todo (nunca hay que confiar solo en el cliente).
 - **Pantalla de bienvenida (splash screen):** con la librería `androidx.core.splashscreen`, usando el mismo ícono y color del banco.
@@ -110,7 +120,7 @@ Antes, el panel principal mostraba `usuarios.saldo` (un número guardado en SQLi
 ## 7. Demostración sugerida (5 minutos)
 
 1. Arrancar la API (`npm start`) y el emulador.
-2. **Registrarse** → mostrar que entra directo al panel. Cerrar sesión e **ingresar** con "Recordar sesión"; cerrar y abrir la app (salta el login).
+2. **Registrarse** → mostrar que entra directo al panel (por debajo, la app ya pidió su JWT a `/api/auth/registro`; ver 6.7). Cerrar sesión e **ingresar** con "Recordar sesión"; cerrar y abrir la app (salta el login y el token se restaura solo).
 3. **Perfil → Tomar foto** (aparece el permiso de cámara) → volver a entrar: la foto persiste.
 4. **Beneficiarios (SQLite + contactos):** agregar desde un contacto, editar, eliminar.
 5. **Mis cuentas** (API): crear una cuenta con saldo → **Ver movimientos**.
@@ -126,16 +136,15 @@ Antes, el panel principal mostraba `usuarios.saldo` (un número guardado en SQLi
 
 **¿Por qué el saldo lo calcula el servidor?** Por seguridad y consistencia: un cliente modificado podría enviar cualquier saldo. Con transacciones y `FOR UPDATE` se evitan también condiciones de carrera.
 
-**¿Qué pasa si no hay internet?** Login, registro y beneficiarios siguen funcionando por completo (son locales). En perfil, la foto sigue funcionando pero el saldo muestra "No disponible" porque se consulta a la API a propósito (ver 6.3.1). Las pantallas de cuentas, movimientos y metas muestran "No se pudo conectar con el servidor".
+**¿Qué pasa si no hay internet?** Login, registro y beneficiarios siguen funcionando por completo (son locales). En perfil, la foto sigue funcionando pero el saldo muestra "No disponible" porque se consulta a la API a propósito (ver 6.3). Sin conexión tampoco se pudo conseguir el JWT (ver 6.7): las pantallas de cuentas, movimientos y metas muestran "No se pudo conectar con el servidor" hasta el próximo login con internet.
 
 **¿Por qué no piden permiso de contactos?** Porque el selector del sistema da acceso solo al contacto elegido (principio de mínimo privilegio).
 
 **¿Qué mejoraría con más tiempo?** *(Sé honesto: son limitaciones reales.)*
-1. **Autenticación en la API con JWT:** hoy la API identifica al dueño por el parámetro `usuario`, y no hay tokens; otro cliente podría consultar datos ajenos. Es la limitación de seguridad más importante.
-2. **Mover el login/registro también a la API:** hoy el usuario y su contraseña viven solo en el SQLite del teléfono; si el cliente cambia de celular, pierde la cuenta. Lo ideal es que también pasen por el backend y SQLite quede como una caché local.
-3. HTTPS en producción y despliegue de la API.
-4. Migrar de SQLite nativo a Room + ViewModel/LiveData.
-5. Pruebas automáticas de la API (por ejemplo con `supertest`) y pruebas instrumentadas de la interfaz (Espresso).
+1. **Mover el login/registro.
+2. HTTPS en producción y despliegue de la API.
+3. Migrar de SQLite nativo a Room + ViewModel/LiveData.
+4. Pruebas automáticas de la API (por ejemplo con `supertest`) y pruebas instrumentadas de la interfaz (Espresso).
 
 ## 9. Reparto sugerido del equipo (ajústenlo a la realidad)
 
@@ -153,7 +162,7 @@ Antes, el panel principal mostraba `usuarios.saldo` (un número guardado en SQLi
 # 1) Base de datos y API
 createdb -U postgres uebank
 psql -U postgres -d uebank -f backend/schema.sql
-cd backend && cp .env.example .env    # editar la clave de PostgreSQL
+cd backend && cp .env.example .env    # editar la clave de PostgreSQL y el JWT_SECRET
 npm install && npm start
 
 # 2) App: abrir el proyecto en Android Studio y ejecutar en un emulador
