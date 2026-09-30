@@ -108,9 +108,6 @@ public class PanelPrincipalActivity extends AppCompatActivity {
     //Cerrar sesión
     private void cerrarSesion() {
         sessionManager.cerrarSesion();
-        // Sin esto, el token del usuario anterior seguiría en memoria y se
-        // colaría en las peticiones de quien inicie sesión después en el
-        // mismo dispositivo (por ejemplo, un celular compartido en clase).
         ApiClient.setToken(null);
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

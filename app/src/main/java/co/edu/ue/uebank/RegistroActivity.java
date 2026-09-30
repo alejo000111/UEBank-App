@@ -14,9 +14,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import co.edu.ue.uebank.api.ApiCallback;
 import co.edu.ue.uebank.api.ApiClient;
 import co.edu.ue.uebank.api.AuthRequest;
+import co.edu.ue.uebank.api.TokenResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import co.edu.ue.uebank.data.UsuarioRepository;
 import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
@@ -115,28 +118,37 @@ public class RegistroActivity extends AppCompatActivity {
 
         sessionManager.iniciarSesion(nuevoUsuario, false);
 
-        // Da de alta el mismo "salt:hash" en la API para conseguir el JWT
-        // que exigen Cuentas/Movimientos/Metas. Si no hay conexión, el
-        // registro local ya quedó guardado igual: la próxima vez que este
-        // usuario inicie sesión con internet, /api/auth/login lo registra
-        // ahí sin que el usuario note nada (ver backend/src/routes/auth.js).
         pedirTokenApi(nuevoUsuario);
+    }
 
+    //Pedir token
+    private void pedirTokenApi(Usuario usuario) {
+        AuthRequest cuerpo = new AuthRequest(usuario.getUsuario(), usuario.getPasswordHash());
+        ApiClient.get().registrarAuth(cuerpo).enqueue(new Callback<TokenResponse>() {
+            @Override
+            public void onResponse(Call<TokenResponse> call, Response<TokenResponse> respuesta) {
+                if (respuesta.isSuccessful() && respuesta.body() != null) {
+                    sessionManager.guardarToken(respuesta.body().token);
+                    ApiClient.setToken(respuesta.body().token);
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.error_generico, Toast.LENGTH_LONG).show();
+                }
+                irAPanelPrincipal();
+            }
+
+            @Override
+            public void onFailure(Call<TokenResponse> call, Throwable error) {
+                Toast.makeText(getApplicationContext(), R.string.error_conexion, Toast.LENGTH_LONG).show();
+                irAPanelPrincipal();
+            }
+        });
+    }
+
+    //Ir al panel principal
+    private void irAPanelPrincipal() {
         Intent intent = new Intent(this, PanelPrincipalActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-    private void pedirTokenApi(Usuario usuario) {
-        // Contexto de aplicación: esta Activity se cierra (finish()) justo
-        // después de lanzar el panel principal.
-        AuthRequest cuerpo = new AuthRequest(usuario.getUsuario(), usuario.getPasswordHash());
-        ApiClient.get().registrarAuth(cuerpo).enqueue(new ApiCallback<>(getApplicationContext(), respuesta -> {
-            if (respuesta != null) {
-                sessionManager.guardarToken(respuesta.token);
-                ApiClient.setToken(respuesta.token);
-            }
-        }));
     }
 }

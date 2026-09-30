@@ -14,13 +14,8 @@ const { requerirToken } = require('./auth');
 //Rutas
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-// Público: aquí es donde se consigue el token que las demás rutas exigen.
 app.use('/api/auth', require('./routes/auth'));
 
-// A partir de aquí, toda ruta exige "Authorization: Bearer <token>" válido
-// (ver src/auth.js). Antes, cualquiera que conociera la API podía pedir los
-// datos de cualquier "usuario" con solo poner su nombre en la URL; ahora
-// hace falta un token emitido para ESE usuario (JWT_SECRET firma cada uno).
 app.use('/api/cuentas', requerirToken, require('./routes/cuentas'));
 app.use('/api/movimientos', requerirToken, require('./routes/movimientos'));
 app.use('/api/metas', requerirToken, require('./routes/metas'));

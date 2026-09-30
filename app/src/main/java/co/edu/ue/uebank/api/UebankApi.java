@@ -14,7 +14,7 @@ import retrofit2.http.Query;
 //Interfaz
 public interface UebankApi {
 
-    //Autenticación (JWT) — públicos, no exigen Authorization
+    //Autenticación
     @POST("auth/registro")
     Call<TokenResponse> registrarAuth(@Body AuthRequest body);
 

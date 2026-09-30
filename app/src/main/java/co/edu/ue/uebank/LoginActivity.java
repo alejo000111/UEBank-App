@@ -16,9 +16,12 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import co.edu.ue.uebank.api.ApiCallback;
 import co.edu.ue.uebank.api.ApiClient;
 import co.edu.ue.uebank.api.AuthRequest;
+import co.edu.ue.uebank.api.TokenResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import co.edu.ue.uebank.data.UsuarioRepository;
 import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
@@ -45,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         this.usuarioRepository = new UsuarioRepository(this);
         this.sessionManager = new SessionManager(this);
 
-        //Restaura el token JWT en memoria (se pierde si el proceso se reinicia)
+        //Restaurar token
         ApiClient.setToken(sessionManager.getToken());
 
         if (sessionManager.haySesionRecordada()) {
@@ -109,25 +112,30 @@ public class LoginActivity extends AppCompatActivity {
 
         sessionManager.iniciarSesion(usuarioEncontrado, cbRecordar.isChecked());
 
-        // La contraseña YA se verificó arriba contra el SQLite local; a la
-        // API solo se le manda ese mismo "salt:hash" (nunca la contraseña)
-        // para conseguir el JWT que exigen Cuentas/Movimientos/Metas. Si no
-        // hay conexión, sigue igual que hasta ahora: esas pantallas
-        // mostrarán "No disponible" hasta el próximo login con internet.
         pedirTokenApi(usuarioEncontrado);
-
-        irAPanelPrincipal();
     }
 
-    //Pide el token JWT a la API tras verificar la contraseña localmente
+    //Pedir token
     private void pedirTokenApi(Usuario usuario) {
         AuthRequest cuerpo = new AuthRequest(usuario.getUsuario(), usuario.getPasswordHash());
-        ApiClient.get().loginAuth(cuerpo).enqueue(new ApiCallback<>(getApplicationContext(), respuesta -> {
-            if (respuesta != null) {
-                sessionManager.guardarToken(respuesta.token);
-                ApiClient.setToken(respuesta.token);
+        ApiClient.get().loginAuth(cuerpo).enqueue(new Callback<TokenResponse>() {
+            @Override
+            public void onResponse(Call<TokenResponse> call, Response<TokenResponse> respuesta) {
+                if (respuesta.isSuccessful() && respuesta.body() != null) {
+                    sessionManager.guardarToken(respuesta.body().token);
+                    ApiClient.setToken(respuesta.body().token);
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.error_generico, Toast.LENGTH_LONG).show();
+                }
+                irAPanelPrincipal();
             }
-        }));
+
+            @Override
+            public void onFailure(Call<TokenResponse> call, Throwable error) {
+                Toast.makeText(getApplicationContext(), R.string.error_conexion, Toast.LENGTH_LONG).show();
+                irAPanelPrincipal();
+            }
+        });
     }
 
     //Ir al panel principal

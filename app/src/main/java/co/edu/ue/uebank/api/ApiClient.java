@@ -10,7 +10,7 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-//Clase — singleton de Retrofit; agrega el JWT a cada petición via AuthInterceptor
+//Clase
 public final class ApiClient {
 
     //Atributos
@@ -23,7 +23,7 @@ public final class ApiClient {
     private ApiClient() {
     }
 
-    //Guarda (o borra, con null) el token que se agrega a cada petición
+    //Guardar token
     public static void setToken(String nuevoToken) {
         token = nuevoToken;
     }

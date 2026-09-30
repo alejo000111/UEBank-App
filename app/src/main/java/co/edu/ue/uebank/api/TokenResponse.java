@@ -1,6 +1,6 @@
 package co.edu.ue.uebank.api;
 
-/** Respuesta de POST /api/auth/registro y /api/auth/login: { "token": "..." }. */
+//Clase
 public class TokenResponse {
     public String token;
 }

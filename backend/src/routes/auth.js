@@ -5,10 +5,7 @@ const HttpError = require('../httpError');
 const { requerido } = require('../validar');
 const { firmarToken } = require('../auth');
 
-// Compara dos "salt:hash" en tiempo constante. timingSafeEqual exige que
-// los dos buffers midan lo mismo, así que si difieren ya sabemos que no
-// coinciden (sin filtrar nada por temporización: la comparación siempre
-// corre sobre buffers del mismo tamaño que el guardado).
+//Comparar hashes
 function hashesIguales(a, b) {
   const bufA = Buffer.from(a, 'utf8');
   const bufB = Buffer.from(b, 'utf8');
@@ -16,17 +13,7 @@ function hashesIguales(a, b) {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
-/**
- * POST /api/auth/registro  { usuario, hash }
- *
- * La app llama esto justo después de crear el usuario en su SQLite local.
- * "hash" es el mismo "salt:hash" en Base64 que ya calculó PasswordUtils en
- * el teléfono: la contraseña real nunca sale del dispositivo. Si el
- * registro en la API falla (por ejemplo, sin conexión), el registro local
- * NO se revierte: el usuario sigue pudiendo usar la app sin conexión, y su
- * cuenta se sincroniza sola la próxima vez que inicie sesión con internet
- * (ver /login más abajo).
- */
+//Registro
 router.post('/registro', async (req, res) => {
   const usuario = requerido(req.body.usuario, 'usuario');
   const hash = requerido(req.body.hash, 'hash');
@@ -40,26 +27,7 @@ router.post('/registro', async (req, res) => {
   res.status(201).json({ token: firmarToken(usuario) });
 });
 
-/**
- * POST /api/auth/login  { usuario, hash }
- *
- * La app SOLO llama esto después de verificar la contraseña localmente con
- * PasswordUtils.verificarPassword (nunca antes). "hash" es ese mismo
- * "salt:hash" ya verificado, no la contraseña.
- *
- * - Si el usuario ya existe en esta tabla, se exige que el hash coincida
- *   exactamente con el guardado.
- * - Si no existe (cuentas creadas antes de este cambio, o registradas sin
- *   conexión), se crea aquí mismo con el hash recibido: como la app ya
- *   verificó la contraseña contra el SQLite del teléfono, este primer
- *   contacto sirve para "dar de alta" esa identidad en la API.
- *
- * Limitación conocida (ver docs/Guia_de_Sustentacion.md § 8.1): la API
- * confía en que quien llama ya verificó la contraseña en el teléfono, no
- * la reconstruye por su cuenta. Migrar el login completo a la API (para
- * que la propia API sea la que verifique la contraseña, sin depender del
- * cliente) es la siguiente mejora pendiente.
- */
+//Login
 router.post('/login', async (req, res) => {
   const usuario = requerido(req.body.usuario, 'usuario');
   const hash = requerido(req.body.hash, 'hash');

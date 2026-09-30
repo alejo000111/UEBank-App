@@ -52,7 +52,7 @@ public class SessionManager {
         return preferencias.getString(KEY_NOMBRE, "");
     }
 
-    //Guarda el JWT que devuelve la API (login/registro)
+    //Guardar token
     public void guardarToken(String token) {
         preferencias.edit().putString(KEY_TOKEN, token).apply();
     }

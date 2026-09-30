@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
   const descripcion = (req.body.descripcion || '').toString().trim();
 
   const creado = await enTransaccion(async (client) => {
-    //FOR UPDATE bloquea la fila; valida dueño antes de depositar/retirar
+    //Bloquear fila y validar dueño
     const cuenta = await client.query(
       'SELECT usuario, saldo FROM cuentas WHERE id = $1 FOR UPDATE',
       [cuentaId]

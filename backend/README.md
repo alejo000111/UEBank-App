@@ -16,6 +16,17 @@
    ```
 5. Probar: abrir http://localhost:3000/api/health → `{"ok":true}`.
 
+### Si la API no arranca después de clonar
+
+El archivo `.env` **no viene en el repo** (está en `.gitignore`), así que hay que crearlo en cada clon:
+
+| Mensaje de error | Causa y solución |
+|---|---|
+| `Falta JWT_SECRET en el archivo .env` | No existe `backend/.env`. Copiar `.env.example` a `.env` y poner un `JWT_SECRET` propio. |
+| `Falta DATABASE_URL en el archivo .env` | Igual: completar `DATABASE_URL` en `.env`. |
+| `No se pudo conectar con PostgreSQL` | PostgreSQL no está corriendo, la clave es incorrecta o la base `uebank` no existe (`createdb -U postgres uebank`). |
+| `Cannot find module ...` | Falta correr `npm install` dentro de `backend/`. |
+
 ## Conectar la app a esta API
 
 **Cada integrante del equipo necesita la API corriendo para ver saldos, cuentas, movimientos y metas.** Sin ella, la app funciona igual (login, registro, beneficiarios, foto) pero muestra "No disponible" o "No se pudo conectar con el servidor" en esas pantallas — eso es justamente lo que se ve si a alguien "no le guarda el saldo": no le falta nada en la app, le falta correr este backend.
