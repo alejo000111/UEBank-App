@@ -11,25 +11,24 @@ import java.util.List;
 import co.edu.ue.uebank.data.BeneficiarioContract.BeneficiarioEntry;
 import co.edu.ue.uebank.model.Beneficiario;
 
-/**
- * CRUD completo de beneficiarios sobre SQLite: Create, Read, Update y Delete.
- * Igual que UsuarioRepository, es la única clase que conoce el SQL de esta tabla.
- */
+//Clase
 public class BeneficiarioRepository {
 
+    //Atributos
     private final DatabaseHelper databaseHelper;
 
+    //Constructor
     public BeneficiarioRepository(Context context) {
         this.databaseHelper = new DatabaseHelper(context);
     }
 
-    // ---------- CREATE ----------
+    //CREATE
     public long insertar(Beneficiario beneficiario) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.insert(BeneficiarioEntry.TABLE_NAME, null, aValores(beneficiario));
     }
 
-    // ---------- READ ----------
+    //READ
     public List<Beneficiario> listarPorUsuario(long idUsuario) {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         List<Beneficiario> lista = new ArrayList<>();
@@ -50,7 +49,7 @@ public class BeneficiarioRepository {
         return lista;
     }
 
-    // ---------- UPDATE ----------
+    //UPDATE
     public boolean actualizar(Beneficiario beneficiario) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         int filas = db.update(
@@ -61,7 +60,7 @@ public class BeneficiarioRepository {
         return filas > 0;
     }
 
-    // ---------- DELETE ----------
+    //DELETE
     public boolean eliminar(long id) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         int filas = db.delete(
@@ -71,6 +70,7 @@ public class BeneficiarioRepository {
         return filas > 0;
     }
 
+    //Objeto a valores
     private ContentValues aValores(Beneficiario beneficiario) {
         ContentValues valores = new ContentValues();
         valores.put(BeneficiarioEntry.COLUMN_ID_USUARIO, beneficiario.getIdUsuario());
@@ -80,6 +80,7 @@ public class BeneficiarioRepository {
         return valores;
     }
 
+    //Cursor a objeto
     private Beneficiario mapearCursor(Cursor cursor) {
         Beneficiario b = new Beneficiario();
         b.setId(cursor.getLong(cursor.getColumnIndexOrThrow(BeneficiarioEntry._ID)));

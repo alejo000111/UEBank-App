@@ -4,6 +4,7 @@ const HttpError = require('../httpError');
 const { requerido, numero } = require('../validar');
 const { exigirDueño } = require('../auth');
 
+//Leer campos
 function leerCampos(body) {
   return [
     requerido(body.nombre, 'nombre'),
@@ -13,7 +14,7 @@ function leerCampos(body) {
   ];
 }
 
-// READ (lista)
+//READ lista
 router.get('/', async (req, res) => {
   const usuario = requerido(req.query.usuario, 'usuario');
   exigirDueño(req, usuario);
@@ -21,7 +22,7 @@ router.get('/', async (req, res) => {
   res.json(rows);
 });
 
-// CREATE
+//CREATE
 router.post('/', async (req, res) => {
   const usuario = requerido(req.body.usuario, 'usuario');
   exigirDueño(req, usuario);
@@ -33,7 +34,7 @@ router.post('/', async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-// UPDATE
+//UPDATE
 router.put('/:id', async (req, res) => {
   const actual = await db.query('SELECT usuario FROM metas WHERE id = $1', [req.params.id]);
   if (!actual.rows.length || actual.rows[0].usuario !== req.usuarioToken) {
@@ -48,7 +49,7 @@ router.put('/:id', async (req, res) => {
   res.json(rows[0]);
 });
 
-// DELETE
+//DELETE
 router.delete('/:id', async (req, res) => {
   const actual = await db.query('SELECT usuario FROM metas WHERE id = $1', [req.params.id]);
   if (!actual.rows.length || actual.rows[0].usuario !== req.usuarioToken) {

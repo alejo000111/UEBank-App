@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Silueta simple de una persona, usada como foto de perfil por defecto
-     mientras el usuario no ha tomado ninguna foto todavía. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="96dp"
     android:height="96dp"

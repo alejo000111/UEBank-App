@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Layout compartido por todas las pantallas de listado con CRUD
-     (Beneficiarios, Cuentas, Movimientos y Metas). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -29,9 +27,7 @@
         android:layout_marginTop="8dp"
         android:layout_weight="1">
 
-        <!-- El indicador de carga es el propio SwipeRefreshLayout: aparece al
-             abrir la pantalla (mientras llega la respuesta de la API) y el
-             usuario también puede deslizar hacia abajo para refrescar. -->
+        <!--Lista con recarga-->
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"

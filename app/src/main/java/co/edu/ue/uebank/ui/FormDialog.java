@@ -8,24 +8,19 @@ import androidx.appcompat.app.AlertDialog;
 
 import co.edu.ue.uebank.R;
 
-/**
- * Diálogo de formulario reutilizable: recibe los campos (hint, tipo de teclado
- * y valor inicial) y devuelve lo escrito. Se usa tanto para crear (valores
- * iniciales vacíos) como para editar (valores iniciales cargados).
- */
+//Clase
 public final class FormDialog {
 
-    /**
-     * Se llama al pulsar "Guardar". Devuelve true si los datos fueron válidos
-     * (el diálogo se cierra) o false para dejarlo abierto y que el usuario corrija.
-     */
+    //Interfaz de guardado
     public interface OnSubmit {
         boolean onSubmit(String[] valores);
     }
 
+    //Constructor
     private FormDialog() {
     }
 
+    //Mostrar formulario
     public static void mostrar(Context context, int tituloRes, String[] hints, int[] tiposEntrada,
                                String[] iniciales, OnSubmit alGuardar) {
         int margen = (int) (20 * context.getResources().getDisplayMetrics().density);
@@ -55,8 +50,6 @@ public final class FormDialog {
 
         dialogo.show();
 
-        // El listener se pone después de show() para que un formulario inválido
-        // NO cierre el diálogo (por defecto el botón positivo siempre lo cierra).
         dialogo.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String[] valores = new String[campos.length];
             for (int i = 0; i < campos.length; i++) {

@@ -2,11 +2,10 @@ package co.edu.ue.uebank.api;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Meta de ahorro de un usuario, tal como la maneja la API.
- */
+//Clase
 public class Meta {
 
+    //Atributos
     public long id;
     public String usuario;
     public String nombre;
@@ -18,8 +17,9 @@ public class Meta {
     public double montoAhorrado;
 
     @SerializedName("fecha_limite")
-    public String fechaLimite; // "AAAA-MM-DD" o null
+    public String fechaLimite;
 
+    //Constructor
     public Meta(String usuario, String nombre, double montoObjetivo, double montoAhorrado, String fechaLimite) {
         this.usuario = usuario;
         this.nombre = nombre;

@@ -13,23 +13,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Callback estándar para las peticiones: si sale bien, entrega el resultado;
- * si el servidor responde con error (400, 404, 409...), muestra el mensaje que
- * envió la API ({"error": "..."}); si no hay conexión, avisa al usuario.
- * Retrofit ejecuta la petición en un hilo secundario y llama a estos métodos
- * en el hilo principal, por eso aquí se puede tocar la interfaz directamente.
- */
+//Clase
 public class ApiCallback<T> implements Callback<T> {
 
+    //Atributos
     private final Context context;
     private final Consumer<T> alExito;
 
+    //Constructor
     public ApiCallback(Context context, Consumer<T> alExito) {
         this.context = context;
         this.alExito = alExito;
     }
 
+    //Respuesta del servidor
     @Override
     public void onResponse(Call<T> call, Response<T> respuesta) {
         if (pantallaCerrada()) {
@@ -42,6 +39,7 @@ public class ApiCallback<T> implements Callback<T> {
         }
     }
 
+    //Error de conexión
     @Override
     public void onFailure(Call<T> call, Throwable error) {
         if (pantallaCerrada()) {
@@ -50,17 +48,18 @@ public class ApiCallback<T> implements Callback<T> {
         Toast.makeText(context, R.string.error_conexion, Toast.LENGTH_LONG).show();
     }
 
+    //Pantalla cerrada
     private boolean pantallaCerrada() {
         return context instanceof Activity && ((Activity) context).isFinishing();
     }
 
+    //Mensaje de error
     private String leerMensajeError(Response<T> respuesta) {
         try {
             if (respuesta.errorBody() != null) {
                 return new JSONObject(respuesta.errorBody().string()).getString("error");
             }
         } catch (Exception ignorado) {
-            // Si el cuerpo no es el JSON esperado, se usa el mensaje genérico.
         }
         return context.getString(R.string.error_generico) + " (" + respuesta.code() + ")";
     }

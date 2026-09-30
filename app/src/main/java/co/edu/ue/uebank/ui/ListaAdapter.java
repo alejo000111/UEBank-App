@@ -15,30 +15,23 @@ import java.util.function.Function;
 
 import co.edu.ue.uebank.R;
 
-/**
- * Adaptador genérico de RecyclerView: pinta cada elemento con un título y un
- * subtítulo (layout item_lista.xml) y avisa cuando se toca una fila. Sirve
- * para cualquier modelo (Beneficiario, Cuenta, Movimiento, Meta): solo hay
- * que decirle cómo obtener el título y el subtítulo de cada uno.
- *
- * RecyclerView reutiliza las vistas de las filas que salen de la pantalla
- * (patrón ViewHolder) en vez de crear una vista nueva por cada elemento como
- * hacía el ListView original: por eso es más eficiente con listas largas.
- */
+//Clase
 public class ListaAdapter<T> extends RecyclerView.Adapter<ListaAdapter.ViewHolder> {
 
+    //Atributos
     private final List<T> items = new ArrayList<>();
     private final Function<T, String> titulo;
     private final Function<T, String> subtitulo;
     private final Consumer<T> alTocar;
 
+    //Constructor
     public ListaAdapter(Function<T, String> titulo, Function<T, String> subtitulo, Consumer<T> alTocar) {
         this.titulo = titulo;
         this.subtitulo = subtitulo;
         this.alTocar = alTocar;
     }
 
-    /** Reemplaza todos los elementos mostrados (recarga completa de la lista). */
+    //Actualizar lista
     public void actualizar(List<T> nuevosItems) {
         items.clear();
         if (nuevosItems != null) {
@@ -47,10 +40,12 @@ public class ListaAdapter<T> extends RecyclerView.Adapter<ListaAdapter.ViewHolde
         notifyDataSetChanged();
     }
 
+    //Lista vacía
     public boolean estaVacia() {
         return items.isEmpty();
     }
 
+    //Crear fila
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,6 +54,7 @@ public class ListaAdapter<T> extends RecyclerView.Adapter<ListaAdapter.ViewHolde
         return new ViewHolder(fila);
     }
 
+    //Llenar fila
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         T item = items.get(position);
@@ -67,11 +63,13 @@ public class ListaAdapter<T> extends RecyclerView.Adapter<ListaAdapter.ViewHolde
         holder.itemView.setOnClickListener(v -> alTocar.accept(item));
     }
 
+    //Cantidad de filas
     @Override
     public int getItemCount() {
         return items.size();
     }
 
+    //ViewHolder
     static class ViewHolder extends RecyclerView.ViewHolder {
         final TextView tvTitulo;
         final TextView tvSubtitulo;

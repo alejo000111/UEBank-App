@@ -9,11 +9,10 @@ import co.edu.ue.uebank.ui.Formato;
 import co.edu.ue.uebank.ui.FormDialog;
 import co.edu.ue.uebank.ui.ListaBaseActivity;
 
-/**
- * CRUD de metas de ahorro consumiendo la API REST.
- */
+//Clase
 public class MetasActivity extends ListaBaseActivity<Meta> {
 
+    //Atributos
     private static final int[] TIPOS_ENTRADA = {
             InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
             InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL,
@@ -21,6 +20,7 @@ public class MetasActivity extends ListaBaseActivity<Meta> {
             InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_DATE
     };
 
+    //Textos de la pantalla
     @Override
     protected int getTituloRes() {
         return R.string.metas_titulo;
@@ -44,19 +44,19 @@ public class MetasActivity extends ListaBaseActivity<Meta> {
         return m.fechaLimite == null ? texto : texto + "  ·  " + m.fechaLimite;
     }
 
-    // ---------- READ ----------
+    //READ
     @Override
     protected void cargarDatos() {
         ApiClient.get().listarMetas(getUsuario()).enqueue(new ApiCallback<>(this, this::mostrar));
     }
 
-    // ---------- CREATE ----------
+    //CREATE
     @Override
     protected void onAgregar() {
         mostrarFormulario(null);
     }
 
-    // ---------- UPDATE / DELETE ----------
+    //UPDATE y DELETE
     @Override
     protected void onItemSeleccionado(Meta meta) {
         mostrarOpciones(
@@ -72,7 +72,7 @@ public class MetasActivity extends ListaBaseActivity<Meta> {
                 });
     }
 
-    /** Formulario para crear (existente == null) o editar una meta. */
+    //Formulario
     private void mostrarFormulario(Meta existente) {
         String[] hints = {
                 getString(R.string.hint_nombre_meta),

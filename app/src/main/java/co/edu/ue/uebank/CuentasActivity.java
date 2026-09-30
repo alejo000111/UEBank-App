@@ -12,13 +12,10 @@ import co.edu.ue.uebank.ui.Formato;
 import co.edu.ue.uebank.ui.FormDialog;
 import co.edu.ue.uebank.ui.ListaBaseActivity;
 
-/**
- * CRUD de cuentas consumiendo la API REST (Node.js + PostgreSQL).
- * El saldo solo se puede modificar registrando movimientos, por eso al editar
- * únicamente se cambian el número y el tipo.
- */
+//Clase
 public class CuentasActivity extends ListaBaseActivity<Cuenta> {
 
+    //Textos de la pantalla
     @Override
     protected int getTituloRes() {
         return R.string.cuentas_titulo;
@@ -39,14 +36,14 @@ public class CuentasActivity extends ListaBaseActivity<Cuenta> {
         return c.tipo + "  ·  " + Formato.moneda(c.saldo);
     }
 
-    // ---------- READ ----------
+    //READ
     @Override
     protected void cargarDatos() {
         ApiClient.get().listarCuentas(getUsuario())
                 .enqueue(new ApiCallback<>(this, this::mostrar));
     }
 
-    // ---------- CREATE ----------
+    //CREATE
     @Override
     protected void onAgregar() {
         String[] hints = {
@@ -80,7 +77,7 @@ public class CuentasActivity extends ListaBaseActivity<Cuenta> {
                 });
     }
 
-    // ---------- UPDATE / DELETE ----------
+    //UPDATE y DELETE
     @Override
     protected void onItemSeleccionado(Cuenta cuenta) {
         mostrarOpciones(
@@ -101,6 +98,7 @@ public class CuentasActivity extends ListaBaseActivity<Cuenta> {
                 });
     }
 
+    //Editar cuenta
     private void editar(Cuenta cuenta) {
         String[] hints = {
                 getString(R.string.hint_numero_cuenta),

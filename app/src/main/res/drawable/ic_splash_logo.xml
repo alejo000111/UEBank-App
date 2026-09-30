@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Logo de la pantalla de bienvenida (splash screen): el mismo banco del
-     ícono de la app, en blanco, para verse sobre el fondo azul de
-     windowSplashScreenBackground. El viewport se deja igual al del ícono
-     (108x108) y solo se agranda el tamaño de salida: así el dibujo queda
-     centrado y con el mismo margen de seguridad, sin recalcular coordenadas. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="240dp"
     android:height="240dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Techo (triángulo) -->
+    <!--Techo-->
     <path
         android:fillColor="#FFFFFFFF"
         android:pathData="M54,26 L82,44 L26,44 Z" />
-    <!-- Base -->
+    <!--Base-->
     <path
         android:fillColor="#FFFFFFFF"
         android:pathData="M24,72 h60 v8 h-60 z" />
-    <!-- Columnas -->
+    <!--Columnas-->
     <path
         android:fillColor="#FFFFFFFF"
         android:pathData="M30,48 h8 v22 h-8 z" />

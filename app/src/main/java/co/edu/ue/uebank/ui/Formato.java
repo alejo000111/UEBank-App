@@ -6,27 +6,26 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-/**
- * Utilidades de formato y validación compartidas por las pantallas.
- */
+//Clase
 public final class Formato {
 
+    //Atributos
     private static final NumberFormat MONEDA =
             NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CO"));
 
     private static final Pattern NUMERO_CUENTA = Pattern.compile("^[0-9]{4,20}$");
     private static final Pattern FECHA_ISO = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$");
 
+    //Constructor
     private Formato() {
     }
 
+    //Formato moneda
     public static String moneda(double valor) {
         return MONEDA.format(valor);
     }
 
-    /**
-     * Convierte el texto de un campo a número. Devuelve null si está vacío o no es válido.
-     */
+    //Texto a número
     public static Double aNumero(String texto) {
         if (texto == null || texto.trim().isEmpty()) {
             return null;
@@ -38,19 +37,12 @@ public final class Formato {
         }
     }
 
-    /**
-     * true si el texto son solo dígitos (entre 4 y 20), el formato que la API
-     * exige para el número de cuenta. Validarlo también en el cliente evita
-     * un viaje de red innecesario cuando el error es obvio.
-     */
+    //Validar número de cuenta
     public static boolean numeroCuentaValido(String texto) {
         return texto != null && NUMERO_CUENTA.matcher(texto.trim()).matches();
     }
 
-    /**
-     * true si el texto está vacío (la fecha es opcional) o si es una fecha
-     * real en formato AAAA-MM-DD, por ejemplo rechaza "2026-02-30".
-     */
+    //Validar fecha
     public static boolean fechaValida(String texto) {
         if (texto == null || texto.trim().isEmpty()) {
             return true;

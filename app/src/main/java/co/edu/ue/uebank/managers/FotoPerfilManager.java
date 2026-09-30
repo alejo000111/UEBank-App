@@ -9,26 +9,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**
- * Guarda y recupera la foto de perfil como un archivo .jpg dentro del
- * almacenamiento interno y privado de la app (nadie más que UEBank puede
- * leer estos archivos, ni siquiera otras apps del teléfono).
- */
+//Clase
 public class FotoPerfilManager {
 
+    //Atributos
     private static final String TAG = "FotoPerfilManager";
     private static final String CARPETA_FOTOS = "fotos_perfil";
 
     private final Context context;
 
+    //Constructor
     public FotoPerfilManager(Context context) {
         this.context = context.getApplicationContext();
     }
 
-    /**
-     * Comprime y guarda la foto tomada con la cámara en un archivo propio del
-     * usuario. Devuelve la ruta absoluta del archivo, o null si algo falló.
-     */
+    //Guardar foto
     public String guardarFotoPerfil(String nombreUsuario, Bitmap foto) {
         File carpeta = new File(context.getFilesDir(), CARPETA_FOTOS);
         if (!carpeta.exists() && !carpeta.mkdirs()) {
@@ -46,10 +41,7 @@ public class FotoPerfilManager {
         }
     }
 
-    /**
-     * Carga la foto de perfil desde su ruta guardada. Devuelve null si la
-     * ruta es nula o el archivo ya no existe.
-     */
+    //Cargar foto
     public Bitmap cargarFotoPerfil(String rutaArchivo) {
         if (rutaArchivo == null) {
             return null;

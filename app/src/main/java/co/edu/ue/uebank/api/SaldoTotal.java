@@ -9,21 +9,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Calcula el saldo total de un usuario: la suma del saldo de todas sus
- * cuentas en la API. Es la ÚNICA fuente de verdad del saldo en toda la app;
- * ni el panel principal ni el perfil guardan su propio número de saldo.
- */
+//Clase
 public final class SaldoTotal {
 
+    //Constructor
     private SaldoTotal() {
     }
 
+    //Interfaz de resultado
     public interface OnResultado {
-        /** total es null si no se pudo consultar (sin conexión o error del servidor). */
         void onSaldo(Double total);
     }
 
+    //Consultar saldo total
     public static void consultar(Context context, String usuario, OnResultado callback) {
         ApiClient.get().listarCuentas(usuario).enqueue(new Callback<List<Cuenta>>() {
             @Override

@@ -19,25 +19,17 @@ import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
 import co.edu.ue.uebank.ui.Formato;
 
-/**
- * Panel principal: lo primero que ve el cliente luego de iniciar sesión.
- * Muestra su saludo y su saldo, y da acceso a los módulos: Beneficiarios
- * (SQLite + contactos) y Cuentas, Movimientos y Metas de ahorro (API REST
- * con PostgreSQL).
- *
- * El saldo mostrado NO es un dato local: se consulta a la API y es la suma
- * de todas las cuentas del cliente (ver SaldoTotal). Así hay una única
- * fuente de verdad para el dinero del cliente, en vez de un número separado
- * y potencialmente desactualizado en SQLite.
- */
+//Clase
 public class PanelPrincipalActivity extends AppCompatActivity {
 
+    //Atributos
     private UsuarioRepository usuarioRepository;
     private SessionManager sessionManager;
 
     private TextView tvSaludo;
     private TextView tvSaldo;
 
+    //Ciclo de vida
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,11 +49,13 @@ public class PanelPrincipalActivity extends AppCompatActivity {
         setupEventListeners();
     }
 
+    //Vistas
     private void initViews() {
         this.tvSaludo = findViewById(R.id.tvSaludo);
         this.tvSaldo = findViewById(R.id.tvSaldo);
     }
 
+    //Eventos
     private void setupEventListeners() {
         Button btnMiPerfil = findViewById(R.id.btnMiPerfil);
         btnMiPerfil.setOnClickListener(v ->
@@ -87,20 +81,19 @@ public class PanelPrincipalActivity extends AppCompatActivity {
         btnCerrarSesion.setOnClickListener(v -> cerrarSesion());
     }
 
+    //Al volver a la pantalla
     @Override
     protected void onResume() {
         super.onResume();
-        // Se recarga cada vez que la pantalla vuelve a primer plano (por
-        // ejemplo, al volver desde Perfil) por si el saldo llegara a cambiar.
         mostrarDatosUsuario();
     }
 
+    //Mostrar datos
     private void mostrarDatosUsuario() {
         long idUsuario = sessionManager.getIdUsuario();
         Usuario usuario = usuarioRepository.obtenerPorId(idUsuario);
 
         if (usuario == null) {
-            // La sesión quedó "huérfana" (no debería pasar en uso normal).
             cerrarSesion();
             return;
         }
@@ -112,6 +105,7 @@ public class PanelPrincipalActivity extends AppCompatActivity {
                 total == null ? getString(R.string.saldo_no_disponible) : Formato.moneda(total)));
     }
 
+    //Cerrar sesión
     private void cerrarSesion() {
         sessionManager.cerrarSesion();
         // Sin esto, el token del usuario anterior seguiría en memoria y se
