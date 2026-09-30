@@ -2,6 +2,7 @@ const router = require('express').Router();
 const db = require('../db');
 const HttpError = require('../httpError');
 const { requerido, numero } = require('../validar');
+const { exigirDueño } = require('../auth');
 
 const TIPOS = ['DEPOSITO', 'RETIRO'];
 
@@ -27,6 +28,7 @@ const SELECT_CON_CUENTA =
 // READ (lista): movimientos del usuario, opcionalmente de una sola cuenta
 router.get('/', async (req, res) => {
   const usuario = requerido(req.query.usuario, 'usuario');
+  exigirDueño(req, usuario);
   const params = [usuario];
   let filtro = '';
   if (req.query.cuenta_id) {
@@ -50,8 +52,16 @@ router.post('/', async (req, res) => {
 
   const creado = await enTransaccion(async (client) => {
     // FOR UPDATE bloquea la fila para que dos movimientos simultáneos no pisen el saldo.
-    const cuenta = await client.query('SELECT saldo FROM cuentas WHERE id = $1 FOR UPDATE', [cuentaId]);
-    if (!cuenta.rows.length) throw new HttpError(404, 'Cuenta no encontrada');
+    // Antes solo se comprobaba que la cuenta existiera: cualquiera que
+    // adivinara un cuenta_id ajeno podía depositar o retirar en ella.
+    const cuenta = await client.query(
+      'SELECT usuario, saldo FROM cuentas WHERE id = $1 FOR UPDATE',
+      [cuentaId]
+    );
+    // 404 y no 403: para quien no es el dueño, una cuenta ajena "no existe".
+    if (!cuenta.rows.length || cuenta.rows[0].usuario !== req.usuarioToken) {
+      throw new HttpError(404, 'Cuenta no encontrada');
+    }
     if (tipo === 'RETIRO' && cuenta.rows[0].saldo < monto) throw new HttpError(400, 'Saldo insuficiente');
 
     const delta = tipo === 'DEPOSITO' ? monto : -monto;
@@ -70,11 +80,16 @@ router.post('/', async (req, res) => {
 // UPDATE: solo la descripción (cambiar monto o tipo alteraría saldos ya registrados)
 router.put('/:id', async (req, res) => {
   const descripcion = (req.body.descripcion || '').toString().trim();
-  const { rowCount } = await db.query('UPDATE movimientos SET descripcion = $1 WHERE id = $2', [
-    descripcion,
-    req.params.id,
-  ]);
-  if (!rowCount) throw new HttpError(404, 'Movimiento no encontrado');
+
+  const actual = await db.query(
+    'SELECT c.usuario FROM movimientos m JOIN cuentas c ON c.id = m.cuenta_id WHERE m.id = $1',
+    [req.params.id]
+  );
+  if (!actual.rows.length || actual.rows[0].usuario !== req.usuarioToken) {
+    throw new HttpError(404, 'Movimiento no encontrado');
+  }
+
+  await db.query('UPDATE movimientos SET descripcion = $1 WHERE id = $2', [descripcion, req.params.id]);
   const { rows } = await db.query(`${SELECT_CON_CUENTA} WHERE m.id = $1`, [req.params.id]);
   res.json(rows[0]);
 });
@@ -83,10 +98,14 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   await enTransaccion(async (client) => {
     const mov = await client.query(
-      'SELECT cuenta_id, tipo, monto FROM movimientos WHERE id = $1 FOR UPDATE',
+      `SELECT m.cuenta_id, m.tipo, m.monto, c.usuario
+       FROM movimientos m JOIN cuentas c ON c.id = m.cuenta_id
+       WHERE m.id = $1 FOR UPDATE`,
       [req.params.id]
     );
-    if (!mov.rows.length) throw new HttpError(404, 'Movimiento no encontrado');
+    if (!mov.rows.length || mov.rows[0].usuario !== req.usuarioToken) {
+      throw new HttpError(404, 'Movimiento no encontrado');
+    }
     const { cuenta_id, tipo, monto } = mov.rows[0];
 
     const cuenta = await client.query('SELECT saldo FROM cuentas WHERE id = $1 FOR UPDATE', [cuenta_id]);
