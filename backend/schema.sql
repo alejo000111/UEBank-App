@@ -1,6 +1,20 @@
 -- Esquema de UEBank en PostgreSQL.
 -- Uso:  createdb uebank  &&  psql -d uebank -f schema.sql
 
+-- Registro de credenciales para emitir/validar JWT (ver src/auth.js).
+-- OJO: la contraseña NUNCA llega aquí en texto plano. La app la hashea
+-- localmente con PBKDF2 (ver security/PasswordUtils) y solo envía ese
+-- "salt:hash" ya calculado; esta tabla guarda ese mismo valor, nunca la
+-- contraseña real. El login/registro completo del cliente sigue viviendo
+-- en el SQLite del teléfono: esta tabla es solo el espejo mínimo que la
+-- API necesita para poder verificar identidad y firmar tokens.
+CREATE TABLE IF NOT EXISTS usuarios (
+    id      SERIAL PRIMARY KEY,
+    usuario VARCHAR(50) NOT NULL UNIQUE,
+    hash    TEXT        NOT NULL,
+    creado  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS cuentas (
     id      SERIAL PRIMARY KEY,
     usuario VARCHAR(50)   NOT NULL,                       -- dueño (usuario de la app)

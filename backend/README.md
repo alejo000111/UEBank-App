@@ -8,7 +8,7 @@
    createdb -U postgres uebank
    psql -U postgres -d uebank -f schema.sql
    ```
-3. Configurar la conexión: copiar `.env.example` a `.env` y poner la clave real de PostgreSQL.
+3. Configurar la conexión: copiar `.env.example` a `.env`, poner la clave real de PostgreSQL y generar un `JWT_SECRET` propio (por ejemplo con `openssl rand -hex 32`). Sin `JWT_SECRET` la API no arranca a propósito: es mejor que falle al iniciar a que firme tokens con un secreto adivinable.
 4. Instalar dependencias y arrancar:
    ```bash
    npm install
@@ -26,9 +26,32 @@ La URL de la API se configura en `local.properties` (raíz del proyecto Android)
 2. **Un celular físico** en la misma red WiFi que el computador con la API: usar la IP de ese computador (`API_BASE_URL=http://192.168.x.x:3000/api/` en `local.properties`) y agregar esa misma IP en `app/src/main/res/xml/network_security_config.xml` (Android bloquea HTTP sin cifrar hacia hosts no listados ahí).
 3. **Recomendado para probar todos juntos:** desplegar esta API en un servicio gratuito con PostgreSQL incluido (por ejemplo [Render](https://render.com) o [Railway](https://railway.app)) y que todo el equipo apunte su `local.properties` a esa URL pública HTTPS. Así todos ven la misma base de datos, nadie necesita instalar PostgreSQL, y al ser HTTPS tampoco hace falta tocar `network_security_config.xml`. Si quieren, puedo preparar el `Dockerfile`/`render.yaml` para dejarlo listo.
 
+## Autenticación (JWT)
+
+Desde esta versión, `cuentas`, `movimientos` y `metas` exigen un token: toda
+petición debe llevar el encabezado `Authorization: Bearer <token>`. Sin él
+(o con uno inválido/vencido) la API responde `401`; con un token válido pero
+de otro usuario, responde `403` (o `404` en rutas por id, para no revelar
+que el recurso existe). `GET /api/health` y `POST /api/auth/*` siguen
+siendo públicos: son la puerta de entrada para conseguir el token.
+
+| Método y ruta | Body | Descripción |
+|---|---|---|
+| `POST /api/auth/registro` | `{usuario, hash}` | Da de alta las credenciales en la API y devuelve `{token}` |
+| `POST /api/auth/login` | `{usuario, hash}` | Verifica el hash y devuelve `{token}` (expira en 24h) |
+
+`hash` es el mismo `"salt:hash"` en Base64 que `PasswordUtils` ya calcula en
+el teléfono (PBKDF2 + sal) — la contraseña real nunca sale del dispositivo
+ni llega a la API en texto plano. La app llama `/login` **después** de
+verificar la contraseña localmente contra su SQLite; ver el comentario en
+`src/routes/auth.js` para el detalle de por qué esto sigue siendo una
+verificación "de tránsito" y no una autenticación 100% del lado del
+servidor (esa es la siguiente mejora pendiente: mover el login completo a
+la API).
+
 ## Endpoints (3 CRUD)
 
-Todos devuelven y reciben JSON. Los errores llegan como `{"error": "mensaje"}`.
+Todos devuelven y reciben JSON. Los errores llegan como `{"error": "mensaje"}`. Estas tres rutas requieren el token (ver arriba).
 
 | Recurso | Método y ruta | Descripción |
 |---|---|---|
@@ -54,12 +77,13 @@ backend/
 └── src/
     ├── server.js         Express, rutas y manejo global de errores
     ├── db.js             conexión (pool) a PostgreSQL
+    ├── auth.js            firma y verifica los JWT (requerirToken, exigirDueño)
     ├── validar.js        validación de campos
     ├── httpError.js      error con código HTTP
-    └── routes/           cuentas.js · movimientos.js · metas.js
+    └── routes/           auth.js · cuentas.js · movimientos.js · metas.js
 ```
 
 ## Limitaciones conocidas
 
-- La API identifica al dueño por el parámetro `usuario` que envía la app; **no hay tokens (JWT)**, así que cualquiera que conozca la API podría pedir datos de otro usuario. Es la primera mejora de seguridad pendiente.
+- **El login completo sigue sin vivir en la API.** `/api/auth/login` confía en que la app ya verificó la contraseña contra el SQLite del teléfono (le pasa el mismo hash, nunca la contraseña); la primera vez que un usuario llama a `/login`, la API se limita a registrar ese hash como "el suyo" (modelo de confianza en el primer uso). Migrar el registro/login completo a la API, para que sea ella la que verifique la contraseña de forma independiente, sigue siendo la mejora pendiente más importante.
 - HTTP sin cifrar: solo aceptable en desarrollo local. En producción, HTTPS.
