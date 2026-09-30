@@ -14,6 +14,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import co.edu.ue.uebank.api.ApiCallback;
+import co.edu.ue.uebank.api.ApiClient;
+import co.edu.ue.uebank.api.AuthRequest;
 import co.edu.ue.uebank.data.UsuarioRepository;
 import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
@@ -113,9 +116,28 @@ public class RegistroActivity extends AppCompatActivity {
         // usuario no tiene que volver a escribir sus datos en el login.
         sessionManager.iniciarSesion(nuevoUsuario, false);
 
+        // Da de alta el mismo "salt:hash" en la API para conseguir el JWT
+        // que exigen Cuentas/Movimientos/Metas. Si no hay conexión, el
+        // registro local ya quedó guardado igual: la próxima vez que este
+        // usuario inicie sesión con internet, /api/auth/login lo registra
+        // ahí sin que el usuario note nada (ver backend/src/routes/auth.js).
+        pedirTokenApi(nuevoUsuario);
+
         Intent intent = new Intent(this, PanelPrincipalActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void pedirTokenApi(Usuario usuario) {
+        // Contexto de aplicación: esta Activity se cierra (finish()) justo
+        // después de lanzar el panel principal.
+        AuthRequest cuerpo = new AuthRequest(usuario.getUsuario(), usuario.getPasswordHash());
+        ApiClient.get().registrarAuth(cuerpo).enqueue(new ApiCallback<>(getApplicationContext(), respuesta -> {
+            if (respuesta != null) {
+                sessionManager.guardarToken(respuesta.token);
+                ApiClient.setToken(respuesta.token);
+            }
+        }));
     }
 }

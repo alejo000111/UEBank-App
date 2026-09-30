@@ -16,6 +16,9 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import co.edu.ue.uebank.api.ApiCallback;
+import co.edu.ue.uebank.api.ApiClient;
+import co.edu.ue.uebank.api.AuthRequest;
 import co.edu.ue.uebank.data.UsuarioRepository;
 import co.edu.ue.uebank.managers.SessionManager;
 import co.edu.ue.uebank.model.Usuario;
@@ -48,6 +51,12 @@ public class LoginActivity extends AppCompatActivity {
 
         this.usuarioRepository = new UsuarioRepository(this);
         this.sessionManager = new SessionManager(this);
+
+        // El token JWT vive en memoria (ApiClient) mientras el proceso de la
+        // app sigue vivo, pero un reinicio del proceso lo borra; se restaura
+        // aquí desde SessionManager para que Cuentas/Movimientos/Metas
+        // sigan funcionando sin pedir login de nuevo.
+        ApiClient.setToken(sessionManager.getToken());
 
         // Si el usuario ya marcó "Recordar sesión" antes, no le mostramos el
         // login otra vez: lo mandamos directo al panel principal.
@@ -108,7 +117,28 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         sessionManager.iniciarSesion(usuarioEncontrado, cbRecordar.isChecked());
+
+        // La contraseña YA se verificó arriba contra el SQLite local; a la
+        // API solo se le manda ese mismo "salt:hash" (nunca la contraseña)
+        // para conseguir el JWT que exigen Cuentas/Movimientos/Metas. Si no
+        // hay conexión, sigue igual que hasta ahora: esas pantallas
+        // mostrarán "No disponible" hasta el próximo login con internet.
+        pedirTokenApi(usuarioEncontrado);
+
         irAPanelPrincipal();
+    }
+
+    private void pedirTokenApi(Usuario usuario) {
+        // Se usa el contexto de aplicación (no "this"): irAPanelPrincipal()
+        // llama a finish() justo después, y ApiCallback ignora la respuesta
+        // si la Activity que la pidió ya se está cerrando.
+        AuthRequest cuerpo = new AuthRequest(usuario.getUsuario(), usuario.getPasswordHash());
+        ApiClient.get().loginAuth(cuerpo).enqueue(new ApiCallback<>(getApplicationContext(), respuesta -> {
+            if (respuesta != null) {
+                sessionManager.guardarToken(respuesta.token);
+                ApiClient.setToken(respuesta.token);
+            }
+        }));
     }
 
     private void irAPanelPrincipal() {
